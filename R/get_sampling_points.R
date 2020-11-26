@@ -7,7 +7,6 @@
 #'
 #' @examples get_sampling_points(6)
 get_sampling_points <- function(n_ugrhi) {
-
   `%>%` <- magrittr::`%>%`
 
 
@@ -26,7 +25,7 @@ get_sampling_points <- function(n_ugrhi) {
 
   r_busca <- httr::POST(u_busca, body = body_busca, encode = "form")
 
-  httr::content(r_busca)
+  # httr::content(r_busca)
 
 
   r_monitoramento <-
@@ -34,15 +33,18 @@ get_sampling_points <- function(n_ugrhi) {
       "https://sistemainfoaguas.cetesb.sp.gov.br/AguasSuperficiais/RelatorioQualidadeAguasSuperficiais/Monitoramento"
     )
 
-    tabela_pontos <-
+  tabela_pontos <-
     r_monitoramento %>%
     httr::content() %>%
     rvest::html_table() %>%
     purrr::pluck(1) %>%
     janitor::clean_names()  %>%
     tibble::as_tibble() %>%
-    dplyr::select(-x)
+    dplyr::select(-x) %>%
+    dplyr::mutate(data_inicio = readr::parse_date(data_inicio, format = "%d/%m/%Y"),
+                  data_fim = as.character(data_fim),
+                  data_fim = readr::parse_date(data_fim, format = "%d/%m/%Y"),
+                  n_ugrhi = n_ugrhi)
 
   tabela_pontos
 }
-

@@ -19,12 +19,19 @@ knitr::opts_chunk$set(
 ```
 
 ```{r}
-login_infoaguas("milz.bea@gmail.com", "PczpBVCTJrqDW")
+login_infoaguas(login = Sys.getenv("CETESB_LOGIN"), 
+                 password =  Sys.getenv("CETESB_PWD"))
+
 ```
 ```{r}
 dplyr::glimpse(sampling_points)
 ```
 
+```{r}
+sampling_points %>% dplyr::filter(is.na(data_fim))
+
+
+```
 
 Temas de aula para aplicar/Roadmap:
 
