@@ -19,16 +19,19 @@ knitr::opts_chunk$set(
 ```
 
 ```{r}
-login_infoaguas(login = Sys.getenv("CETESB_LOGIN"), 
+infoaguas::login_infoaguas(login = Sys.getenv("CETESB_LOGIN"), 
                  password =  Sys.getenv("CETESB_PWD"))
 
 ```
 ```{r}
 dplyr::glimpse(sampling_points)
 ```
-
+Análise:
+- Pontos em operação
+- MMP (Delimitação EMPLASA)
 ```{r}
-sampling_points %>% dplyr::filter(is.na(data_fim))
+sampling_points %>% 
+  dplyr::filter(is.na(data_fim))
 
 
 ```
@@ -36,10 +39,10 @@ sampling_points %>% dplyr::filter(is.na(data_fim))
 Temas de aula para aplicar/Roadmap:
 
 - Aula 1 à 3:
-  - [ ] O site tem API?
-  - [ ] Autenticaçã na API
-  - [ ] XPath
-  - [ ] Senha guardada no .Renviron
+  - [X] O site tem API?
+  - [X] Autenticaçã na API
+  - [X] XPath
+  - [X] Senha guardada no .Renviron
 
 
 - Aula 4: 

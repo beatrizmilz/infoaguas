@@ -30,7 +30,8 @@ get_sampling_points <- function(n_ugrhi) {
 
   r_monitoramento <-
     httr::GET(
-      "https://sistemainfoaguas.cetesb.sp.gov.br/AguasSuperficiais/RelatorioQualidadeAguasSuperficiais/Monitoramento")
+      "https://sistemainfoaguas.cetesb.sp.gov.br/AguasSuperficiais/RelatorioQualidadeAguasSuperficiais/Monitoramento"
+    )
 
 
   id_ponto <- r_monitoramento %>%
@@ -49,21 +50,27 @@ get_sampling_points <- function(n_ugrhi) {
     tibble::as_tibble() %>%
     tibble::add_column(id_ponto) %>%
     dplyr::select(-x) %>%
-    dplyr::mutate(data_inicio = readr::parse_date(data_inicio, format = "%d/%m/%Y"),
-                  data_fim = as.character(data_fim),
-                  data_fim = readr::parse_date(data_fim, format = "%d/%m/%Y"),
-                  n_ugrhi = n_ugrhi,
-                  muni = abjutils::rm_accent(municipio),
-                  muni = stringr::str_replace_all(muni, "-", " "),
-                  muni = dplyr::case_when(muni == "SANTANA DO PARNAIBA" ~
-                                            "SANTANA DE PARNAIBA",
-                                          muni == "QUEIROS" ~ "QUEIROZ",
-                                          TRUE ~ muni))
+    dplyr::mutate(
+      data_inicio = readr::parse_date(data_inicio, format = "%d/%m/%Y"),
+      data_fim = as.character(data_fim),
+      data_fim = readr::parse_date(data_fim, format = "%d/%m/%Y"),
+      n_ugrhi = n_ugrhi,
+      muni = abjutils::rm_accent(municipio),
+      muni = stringr::str_replace_all(muni, "-", " "),
+      muni = dplyr::case_when(
+        muni == "SANTANA DO PARNAIBA" ~
+          "SANTANA DE PARNAIBA",
+        muni == "QUEIROS" ~ "QUEIROZ",
+        TRUE ~ muni
+      )
+    )
 
- join_code_muni <- tabela_pontos %>% dplyr::left_join(municipios_sp, by = "muni") %>% dplyr::select(-muni)
+  join_code_muni <-  tabela_pontos %>%
+    dplyr::left_join(municipios_sp, by = "muni") %>%
+    dplyr::select(-muni)
 
 
- join_code_muni
+  join_code_muni
 
 
 }
