@@ -1,0 +1,60 @@
+---
+title: "trabalho_final_web-scraping"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{trabalho_final_web-scraping}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+#library(infoaguas)
+```
+
+```{r}
+login_infoaguas("milz.bea@gmail.com", "PczpBVCTJrqDW")
+```
+```{r}
+dplyr::glimpse(sampling_points)
+```
+
+
+Temas de aula para aplicar/Roadmap:
+
+- Aula 1 à 3:
+  - [ ] O site tem API?
+  - [ ] Autenticaçã na API
+  - [ ] XPath
+  - [ ] Senha guardada no .Renviron
+
+
+- Aula 4: 
+  - [ ] Tratamento de erros - possibly/safely
+  - [ ] Programação funcional - purrr (ou furrr)
+  - [ ] Paralelização - pacote furrr
+  - [ ] Barras de progresso - pacote progressr
+  - [ ] Tempo que demora para funcionar - pacote tictoc 
+
+
+- Aula 6:
+
+
+Anotações para mim mesma:
+
+- Não usar rvest, no máximo a função `html_table()`.
+
+- Não usar CssPath
+
+- Não usar selenium
+
+
+Referências
+
+https://www.curso-r.com/blog/2018-03-19-scraper-cetesb/
