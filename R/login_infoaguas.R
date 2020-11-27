@@ -7,8 +7,7 @@
 #' @export
 #'
 #' @examples
-login_infoaguas <- function(login, password){
-
+login_infoaguas <- function(login, password) {
   `%>%` <- magrittr::`%>%`
 
   u <- "https://sistemainfoaguas.cetesb.sp.gov.br"
@@ -31,7 +30,15 @@ login_infoaguas <- function(login, password){
 
   r_post <- httr::POST(u, body = body, encode = "form")
 
-  httr::content(r_post) %>% purrr::pluck("result") # Result "ok" -> autenticação deu certo!
+  resposta <-
+    httr::content(r_post) %>% purrr::pluck("result") # Result "ok" -> autenticação deu certo!
 
+  if (resposta == "Ok") {
+    message("A autenticação no Sistema Infoáguas foi realizada.")
+  } else if (resposta == "Erro") {
+    stop("A autenticação no Sistema Infoáguas não foi realizada.
+         Verifique se o email e senha informados estão corretos.")
+  }
 
 }
+
