@@ -1,12 +1,9 @@
-#' Função para obter a tabela de pontos por ugrhi
-#'
-#' @param n_ugrhi
-#'
+#' Função para obter a tabela de pontos de monitoramneto
 #' @return
 #' @export
 #'
-#' @examples get_sampling_points(6)
-get_sampling_points <- function(n_ugrhi) {
+#' @examples get_sampling_points()
+get_sampling_points <- function() {
   `%>%` <- magrittr::`%>%`
 
 
@@ -16,8 +13,7 @@ get_sampling_points <- function(n_ugrhi) {
 
   body_busca <- list(
     "TipoConsulta" = "Monitoramento",
-    "FiltroTipo" = "1",
-    "NUGRHI" = n_ugrhi,
+    "FiltroTipo" = "0",
     "X-Requested-With" = "XMLHttpRequest"
 
   )
@@ -30,47 +26,65 @@ get_sampling_points <- function(n_ugrhi) {
 
   r_monitoramento <-
     httr::GET(
-      "https://sistemainfoaguas.cetesb.sp.gov.br/AguasSuperficiais/RelatorioQualidadeAguasSuperficiais/Monitoramento"
+      "https://sistemainfoaguas.cetesb.sp.gov.br/AguasSuperficiais/RelatorioQualidadeAguasSuperficiais/Monitoramento",
+      httr::write_disk("inst/monitoramento.html", overwrite = TRUE)
     )
 
 
-  id_ponto <- r_monitoramento %>%
+  teste_autenticacao <- r_monitoramento %>%
     xml2::read_html() %>%
-    xml2::xml_find_first("//table//tbody") %>%
-    xml2::xml_find_all("//input") %>%
-    xml2::xml_attr("value")
+    xml2::xml_find_first("//*[@name='__RequestVerificationToken']") %>%
+    xml2::xml_attr("name")
+
+  if (is.na(teste_autenticacao)) {
+    cod_interaguas  <- r_monitoramento %>%
+      xml2::read_html() %>%
+      xml2::xml_find_first("//table//tbody") %>%
+      xml2::xml_find_all("//input") %>%
+      xml2::xml_attr("value")
 
 
-  tabela_pontos <-
-    r_monitoramento %>%
-    httr::content() %>%
-    rvest::html_table() %>%
-    purrr::pluck(1) %>%
-    janitor::clean_names()  %>%
-    tibble::as_tibble() %>%
-    tibble::add_column(id_ponto) %>%
-    dplyr::select(-x) %>%
-    dplyr::mutate(
-      data_inicio = readr::parse_date(data_inicio, format = "%d/%m/%Y"),
-      data_fim = as.character(data_fim),
-      data_fim = readr::parse_date(data_fim, format = "%d/%m/%Y"),
-      n_ugrhi = n_ugrhi,
-      muni = abjutils::rm_accent(municipio),
-      muni = stringr::str_replace_all(muni, "-", " "),
-      muni = dplyr::case_when(
-        muni == "SANTANA DO PARNAIBA" ~
-          "SANTANA DE PARNAIBA",
-        muni == "QUEIROS" ~ "QUEIROZ",
-        TRUE ~ muni
+    tabela_pontos <-
+      r_monitoramento %>%
+      httr::content() %>%
+      rvest::html_table() %>%
+      purrr::pluck(1) %>%
+      janitor::clean_names()  %>%
+      tibble::as_tibble() %>%
+      tibble::add_column(cod_interaguas) %>%
+      dplyr::select(-x) %>%
+      dplyr::mutate(
+        data_inicio = readr::parse_date(data_inicio, format = "%d/%m/%Y"),
+        data_fim = as.character(data_fim),
+        data_fim = readr::parse_date(data_fim, format = "%d/%m/%Y"),
+        muni = abjutils::rm_accent(municipio),
+        muni = stringr::str_replace_all(muni, "-", " "),
+        muni = dplyr::case_when(
+          muni == "SANTANA DO PARNAIBA" ~
+            "SANTANA DE PARNAIBA",
+          muni == "QUEIROS" ~ "QUEIROZ",
+          TRUE ~ muni
+        )
       )
+
+    join_code_muni <-  tabela_pontos %>%
+      dplyr::left_join(infoaguas::municipios_sp, by = "muni") %>%
+      dplyr::select(-muni)
+
+
+    join_code_muni
+
+    tabela_pontos
+  } else {
+    stop(
+      "Você precisa realizar a autenticação antes de utilizar essa função.
+         Utilize a seguinte função, informando seu email e senha cadastrados no sistema Infoáguas:
+         login_infoaguas(login = .... , password = ....)
+
+         Caso não tenha realizado o cadastro, é possível realizar neste site:
+         https://sistemainfoaguas.cetesb.sp.gov.br/Login/Index"
     )
-
-  join_code_muni <-  tabela_pontos %>%
-    dplyr::left_join(municipios_sp, by = "muni") %>%
-    dplyr::select(-muni)
-
-
-  join_code_muni
+  }
 
 
 }
