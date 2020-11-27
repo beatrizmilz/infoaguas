@@ -1,5 +1,5 @@
 ---
-title: "Qualidade da água na Macrometrópole Paulista"
+title: "Qualidade da água em São Paulo"
 output: 
   learnr::tutorial:
     css: css/custom.css
@@ -33,12 +33,20 @@ Boas vindas! Esta página corresponde ao trabalho final para o curso [Web Scrapi
 
 A Companhia Ambiental do Estado de São Paulo (CETESB) é a agência ambiental responsável pelo desenvolvimento de ações de controle, licenciamento, fiscalização e monitoramento das atividades potencialmente poluidoras no Estado de São Paulo[*](https://www.saopaulo.sp.gov.br/orgaos-e-entidades/empresas/cetesb/). Essa agência realiza o monitoramento da qualidade das águas das praias, rios, represas, do ar e do solo no Estado de São Paulo.
 
-> Falar da estrutura de monitoramento  da CETESB
+
+Os dados referentes ao monitoramento da qualidade do ar são disponibilizados no sistema [Qualar](https://cetesb.sp.gov.br/ar/qualar/), e o sistema [Infoaguas](https://cetesb.sp.gov.br/infoaguas/) disponibiliza dados referentes à qualidade da água. Entretanto, não existe uma API (_Application Programming Interface_) pública para acesso dessas informações, e ambos os sistemas foram elaborados de forma que obter informações para um amplo recorte espacial e temporal seja trabalhoso, requerendo bastante trabalho manual. 
+
+```{r include=FALSE}
+pontos_ativos <- sampling_points %>% 
+  dplyr::filter(is.na(data_fim))
+```
+
+O pacote [`Rpollution`](https://github.com/williamorim/Rpollution), desenvolvido por @R-Rpollution,  disponibiliza funções para obter os dados do sistema Qualar utilizando a linguagem de programação R e técnicas de Web Scraping. Entretanto, não foi encontrado alguma ferramenta similar para obtenção dos dados disponibilizados no sistema Infoaguas. Esses dados são importantes para acompanhar a situação de qualidade dos principais mananciais de abastecimento público do Estado de São Paulo[*](https://cetesb.sp.gov.br/aguas-interiores/programa-de-monitoramento/). 
+
+> Segundo os dados disponibilizados no sistema Infoaguas, atualmente existem `r nrow(pontos_ativos)` pontos de coleta ativos no Estado de São Paulo.
 
 
-Os dados referentes ao monitoramento da qualidade do ar são disponibilizados no sistema [Qualar](https://cetesb.sp.gov.br/ar/qualar/), e o sistema [InfoAguas](https://cetesb.sp.gov.br/infoaguas/) disponibiliza dados referentes à qualidade da água. Entretanto, não existe uma API (_Application Programming Interface_) pública para acesso dessas informações, e ambos os sistemas foram elaborados de forma que obter informações para um amplo recorte espacial e temporal seja trabalhoso, requerendo bastante trabalho manual.  
-
-O pacote [`Rpollution`](https://github.com/williamorim/Rpollution), desenvolvido por @R-Rpollution,  disponibiliza funções para obter os dados do sistema Qualar utilizando a linguagem de programação R e técnicas de Web Scraping. Entretanto, não foi encontrado alguma ferramenta similar para obtenção dos dados disponibilizados no sistema InfoAguas. Portanto, __o objetivo deste trabalho foi desenvolver funções que possibilitem acessar os dados disponibilizados no sistema InfoAguas para Águas Superficiais__, para que pessoas pesquisadoras, jornalistas, e outras interessadas possam ter acesso à estes dados de forma automatizada. Ao final, para exemplificar o uso dos dados obtidos, __uma breve análise descritiva será realizada com os dados de qualidade da água no território da Macrometrópole Paulista__.
+Portanto, __o objetivo deste trabalho foi desenvolver funções que possibilitem acessar os dados disponibilizados no sistema Infoaguas para Águas Superficiais__, para que pessoas pesquisadoras, jornalistas, e outras interessadas possam ter acesso à estes dados de forma automatizada. Ao final, para exemplificar o uso dos dados obtidos, __uma breve análise descritiva será realizada com os dados de qualidade da água no território da Macrometrópole Paulista__.
 
 ### Pacotes utilizados
 
@@ -56,18 +64,21 @@ pacotes_funcoes <- c("httr", "magrittr", "xml2", "purrr", "dplyr", "rvest", "jan
 pacotes_usados_funcoes <- listar_pacotes(pacotes_funcoes)
 
 
-pacotes_relatorio <- c("learnr", "knitr", "readxl", "DT", "rmarkdown")
+pacotes_relatorio <- c("learnr", "knitr", "readxl", "DT", "rmarkdown", "glue", "sf")
 pacotes_usados_relatorio <- listar_pacotes(pacotes_relatorio)
 
 ```
 
-Nas funções desenvolvidas neste trabalho, foram usados dos seguintes pacotes: `r pacotes_usados_funcoes`. Além destes, para a elaboração deste relatório também foi utilizado os pacotes `r pacotes_usados_relatorio`.
+Nas funções desenvolvidas neste trabalho, foram usados dos seguintes pacotes: `r pacotes_usados_funcoes`. 
+
+
+Além destes, para a elaboração deste relatório também foi utilizado os pacotes `r pacotes_usados_relatorio`.
 
 
 
 ## Acessando os dados
 
-Para demonstrar como funciona o acesso manual no sistema InfoAguas, a seguir estão algumas _screenshots_ que demonstram o fluxo de navegação no site até que seja possível obter os dados.
+Para demonstrar como funciona o acesso manual no sistema Infoaguas, a seguir estão algumas _screenshots_ que demonstram o fluxo de navegação no site até que seja possível obter os dados.
 
 1. Ao acessar o Sistema INFOAGUAS (através do link https://sistemainfoaguas.cetesb.sp.gov.br/ ), é solicitado a autenticação através de login e senha. Caso não tenha um cadastro, é possível realizar através do botão "Novo Usuário".
 
@@ -178,7 +189,7 @@ A seguir, apresento uma breve descrição das funções desenvolvidas neste trab
 
 O sistema InfoÁguas solicita login para acessar os dados. Portanto, primeiramente é necessário realizar a autentição.
 
-A função `login_infoaguas()` tem como argumentos o email (`login`) e a senha (`password`), e realiza a autenticação no sistema InfoAguas através de uma requisição do tipo `POST`.
+A função `login_infoaguas()` tem como argumentos o email (`login`) e a senha (`password`), e realiza a autenticação no sistema Infoaguas através de uma requisição do tipo `POST`.
 
 
 Obs: Nesta etapa foi necessário pedir ajuda aos professores!
@@ -221,6 +232,9 @@ DT::datatable(sampling_points)
 
 > Em breve!
 
+## Agradecimentos
+
+- [Post sobre o scraper do QUALAR](https://www.curso-r.com/blog/2018-03-19-scraper-cetesb/) - Por William Amorim
 
 ## Referências
 
@@ -232,4 +246,5 @@ knitr::write_bib(c('Rpollution', pacotes_funcoes, pacotes_relatorio), 'packages.
 be here if you have appendix pages 
 otherwise you can remove it.-->
 <div id="refs"></div> 
+
 

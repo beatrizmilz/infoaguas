@@ -77,7 +77,7 @@ get_sampling_points <- function() {
   } else {
     stop(
       "Você precisa realizar a autenticação antes de utilizar essa função.
-         Utilize a seguinte função, informando seu email e senha cadastrados no sistema Infoáguas:
+         Utilize a seguinte função, informando seu email e senha cadastrados no sistema Infoaguas:
          login_infoaguas(login = .... , password = ....)
 
          Caso não tenha realizado o cadastro, é possível realizar neste site:

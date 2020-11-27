@@ -2,7 +2,7 @@ get_results <- function(sampling_point, start, end) {
   `%>%` <- magrittr::`%>%`
 
 
-  n_ugrhi <- 6
+  # n_ugrhi <- 6
   sampling_point <- 106
   start <- "01/01/2020"
   end <- "25/11/2020"
@@ -12,16 +12,21 @@ get_results <- function(sampling_point, start, end) {
     "https://sistemainfoaguas.cetesb.sp.gov.br/AguasSuperficiais/RelatorioQualidadeAguasSuperficiais"
 
 
+  res <- httr::GET(u_busca)
+
+  cookies <- httr::cookies(res)$value %>%
+    purrr::set_names(httr::cookies(res)$name)
+
+
   body_busca <- list(
     "TipoConsulta" = "Monitoramento",
-    "FiltroTipo" = "1",
-    "NUGRHI" = n_ugrhi,
+    "FiltroTipo" = "0",
     "X-Requested-With" = "XMLHttpRequest"
 
   )
 
 
-  r_busca <- httr::POST(u_busca, body = body_busca, encode = "form")
+  r_busca <- httr::POST(u_busca, body = body_busca, encode = "form",  httr::set_cookies(cookies))
 
 
   u_busca <-
@@ -38,16 +43,14 @@ get_results <- function(sampling_point, start, end) {
   )
 
 
-  r_busca <- httr::POST(
-    u_busca,
- #   query = list(method = "pesquisar"),
-    body = body_busca,
-    encode = "form"#,
-  #  httr::accept("xlsx")
-  )
+  r_busca <- httr::POST(u_busca,
+                        #   query = list(method = "pesquisar"),
+                        body = body_busca,
+                        encode = "form"#,
 
-  httr::content(r_busca)
-
+                        #  httr::accept("xlsx")
+                        ,
+                        httr::set_cookies(cookies))
 
 
 
@@ -59,5 +62,6 @@ get_results <- function(sampling_point, start, end) {
 
 
   # Até aqui: o html pede para fazer a busca pela data (mas já fiz....) (?)
+
 
 }

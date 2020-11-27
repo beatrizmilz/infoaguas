@@ -2,7 +2,7 @@
 % Please edit documentation in R/login_infoaguas.R
 \name{login_infoaguas}
 \alias{login_infoaguas}
-\title{Função para autenticar no Sistema InfoAguas da CETESB}
+\title{Função para autenticar no Sistema Infoaguas da CETESB}
 \usage{
 login_infoaguas(login, password)
 }
@@ -13,5 +13,5 @@ login_infoaguas(login, password)
 
 }
 \description{
-Função para autenticar no Sistema InfoAguas da CETESB
+Função para autenticar no Sistema Infoaguas da CETESB
 }

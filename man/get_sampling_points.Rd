@@ -2,19 +2,16 @@
 % Please edit documentation in R/get_sampling_points.R
 \name{get_sampling_points}
 \alias{get_sampling_points}
-\title{Função para obter a tabela de pontos por ugrhi}
+\title{Função para obter a tabela de pontos de monitoramneto}
 \usage{
-get_sampling_points(n_ugrhi)
-}
-\arguments{
-\item{n_ugrhi}{}
+get_sampling_points()
 }
 \value{
 
 }
 \description{
-Função para obter a tabela de pontos por ugrhi
+Função para obter a tabela de pontos de monitoramneto
 }
 \examples{
-get_sampling_points(6)
+get_sampling_points()
 }

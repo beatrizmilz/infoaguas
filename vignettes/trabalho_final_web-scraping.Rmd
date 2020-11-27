@@ -29,11 +29,10 @@ dplyr::glimpse(sampling_points)
 Análise:
 - Pontos em operação
 - MMP (Delimitação EMPLASA)
-```{r}
+
+```{r include=FALSE}
 sampling_points %>% 
   dplyr::filter(is.na(data_fim))
-
-
 ```
 
 Temas de aula para aplicar/Roadmap:

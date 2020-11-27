@@ -1,4 +1,4 @@
-#' Função para autenticar no Sistema InfoAguas da CETESB
+#' Função para autenticar no Sistema Infoaguas da CETESB
 #'
 #' @param login
 #' @param password
@@ -34,9 +34,9 @@ login_infoaguas <- function(login, password) {
     httr::content(r_post) %>% purrr::pluck("result") # Result "ok" -> autenticação deu certo!
 
   if (resposta == "Ok") {
-    message("A autenticação no Sistema Infoáguas foi realizada.")
+    message("A autenticação no Sistema Infoaguas foi realizada.")
   } else if (resposta == "Erro") {
-    stop("A autenticação no Sistema Infoáguas não foi realizada.
+    stop("A autenticação no Sistema Infoaguas não foi realizada.
          Verifique se o email e senha informados estão corretos.")
   }
 
