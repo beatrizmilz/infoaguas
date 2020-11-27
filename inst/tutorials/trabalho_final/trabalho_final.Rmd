@@ -1,0 +1,100 @@
+---
+title: "Qualidade da água na Macrometrópole Paulista"
+output: 
+  learnr::tutorial:
+    css: css/custom.css
+    progressive: true
+    allow_skip: true
+bibliography: [packages.bib]
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+library(infoaguas)
+knitr::opts_chunk$set(echo = TRUE, out.width="90%", fig.align = "center")
+tutorial_options(exercise.cap = "Código")
+```
+
+**Trabalho final para o curso '[Web Scraping](https://www.curso-r.com/cursos/web-scraping/)'**. <br>
+**[Beatriz Milz](https://beatrizmilz.com)**   <a href='mailto:beatriz.milz@usp.br'><i class="far fa-envelope"></i></a>   <a href='https://twitter.com/BeaMilz'  target="_blank"><i class="fab fa-twitter"></i></a>   <a href='https://github.com/beatrizmilz' target="_blank"><i class="fab fa-github"></i></a>   <a href='https://orcid.org/0000-0002-3064-4486' target="_blank"><i class="fab fa-orcid"></i></a>   <a href='http://lattes.cnpq.br/5150665880581477' target="_blank"><i class="ai ai-lattes"></i></a>   <a href='https://beatrizmilz.github.io/resume/index.html' target="_blank"><i class="ai ai-cv"></i></a>   <a href='https://discourse.curso-r.com/u/beatrizmilz/summary' target="_blank"><i class="fab fa-discourse"></i></a> 
+<br>
+
+Atualizado em `r format(Sys.Date(), format='%d de %B de %Y')`.
+
+## Contextualização
+
+Boas vindas! Esta página corresponde ao trabalho final para o curso [Web Scraping](https://www.curso-r.com/cursos/web-scraping/), oferecido pela [Curso-R](https://www.curso-r.com/) e ministrado por [Julio Trecenti](https://github.com/jtrecenti) e [Caio Lente](https://lente.dev/). O objetivo proposto para o trabalho final é construir um produto de dados que utilize Web Scraping.
+
+### Introdução
+
+> Falar da dificuldade para obter dados da qualidade da água/ambientais
+
+A Companhia Ambiental do Estado de São Paulo (CETESB) é a agência ambiental responsável pelo desenvolvimento de ações de controle, licenciamento, fiscalização e monitoramento das atividades potencialmente poluidoras no Estado de São Paulo[*](https://www.saopaulo.sp.gov.br/orgaos-e-entidades/empresas/cetesb/). Esta agência realiza o monitoramento da qualidade das águas das praias, rios, represas, do ar e do solo no Estado de São Paulo.
+
+> Falar da estrutura de monitoramento  da CETESB
+
+
+Os dados referentes ao monitoramento da qualidade do ar são disponibilizados no sistema [Qualar](https://cetesb.sp.gov.br/ar/qualar/), e o sistema [InfoAguas](https://cetesb.sp.gov.br/infoaguas/) disponibiliza dados referentes à qualidade da água. Entretanto, não existe uma API (_Application Programming Interface_) pública para acesso dessas informações, e ambos os sistemas foram elaborados de forma que obter informações para um amplo recorte espacial e temporal seja trabalhoso, requerendo bastante trabalho manual.  
+
+O pacote [`Rpollution`](https://github.com/williamorim/Rpollution), desenvolvido por @R-Rpollution,  disponibiliza funções para obter os dados do sistema Qualar utilizando a linguagem de programação R e técnicas de Web Scraping. Entretanto, não foi encontrado alguma ferramenta similar para obtenção dos dados disponibilizados no sistema InfoAguas. Portanto, o objetivo deste trabalho foi desenvolver funções que possibilitem acessar os dados disponibilizados no sistema InfoAguas, para que pessoas pesquisadoras, jornalistas, e outras interessadas possam ter acesso à estes dados de forma automatizada. Ao final, para exemplificar o uso dos dados obtidos, uma breve análise descritiva será realizada com os dados de qualidade da água no território da Macrometrópole Paulista.
+
+## Acessando os dados
+
+Para demonstrar como funciona o acesso no sistema InfoAguas, a seguir estão algumas _screenshots_ que demonstram o fluxo de navegação no site até que seja possível obter os dados.
+
+1. 
+
+```{r echo=FALSE}
+knitr::include_graphics("images/infoaguas_login.png")
+```
+
+
+## Funções desenvolvidas
+
+### Autenticação no sistema
+
+```{r eval=FALSE, include=TRUE}
+login_infoaguas(login =  ... ,
+                password = ...)
+```
+
+### Obter pontos de coleta 
+
+> Explicar!
+
+
+### Buscar dados de qualidade da água
+> Em breve!
+
+
+## Bases de dados obtidas
+
+### Pontos de coleta
+
+```{r}
+DT::datatable(sampling_points)
+```
+
+### Dados de qualidade da água
+
+> Em breve!
+
+
+
+## Análise descritiva dos dados
+
+> Em breve!
+
+
+## Referências
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+knitr::write_bib(c('Rpollution'), 'packages.bib')
+```
+
+<!-- This '<div id="refs"></div>' needs to 
+be here if you have appendix pages 
+otherwise you can remove it.-->
+<div id="refs"></div> 
+
