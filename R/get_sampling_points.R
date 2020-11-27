@@ -27,7 +27,7 @@ get_sampling_points <- function() {
   r_monitoramento <-
     httr::GET(
       "https://sistemainfoaguas.cetesb.sp.gov.br/AguasSuperficiais/RelatorioQualidadeAguasSuperficiais/Monitoramento")
-    )
+
 
 
   teste_autenticacao <- r_monitoramento %>%

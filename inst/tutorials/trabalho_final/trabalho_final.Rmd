@@ -3,7 +3,7 @@ title: "Qualidade da água na Macrometrópole Paulista"
 output: 
   learnr::tutorial:
     css: css/custom.css
-    progressive: true
+    progressive: false
     allow_skip: true
 bibliography: [packages.bib]
 runtime: shiny_prerendered
@@ -40,6 +40,31 @@ Os dados referentes ao monitoramento da qualidade do ar são disponibilizados no
 
 O pacote [`Rpollution`](https://github.com/williamorim/Rpollution), desenvolvido por @R-Rpollution,  disponibiliza funções para obter os dados do sistema Qualar utilizando a linguagem de programação R e técnicas de Web Scraping. Entretanto, não foi encontrado alguma ferramenta similar para obtenção dos dados disponibilizados no sistema InfoAguas. Portanto, __o objetivo deste trabalho foi desenvolver funções que possibilitem acessar os dados disponibilizados no sistema InfoAguas para Águas Superficiais__, para que pessoas pesquisadoras, jornalistas, e outras interessadas possam ter acesso à estes dados de forma automatizada. Ao final, para exemplificar o uso dos dados obtidos, __uma breve análise descritiva será realizada com os dados de qualidade da água no território da Macrometrópole Paulista__.
 
+### Pacotes utilizados
+
+
+```{r include=FALSE}
+listar_pacotes <- function(vetor){
+  vetor %>% tibble::as_tibble() %>% dplyr::arrange(value) %>% 
+    dplyr::mutate(citacao = glue::glue("`{value}` [@R-{value}]")) %>% 
+    dplyr::summarise(citacao_completa = knitr::combine_words(citacao, and = "e ")) %>% 
+    dplyr::pull()
+  
+}
+
+pacotes_funcoes <- c("httr", "magrittr", "xml2", "purrr", "dplyr", "rvest", "janitor", "tibble")
+pacotes_usados_funcoes <- listar_pacotes(pacotes_funcoes)
+
+
+pacotes_relatorio <- c("learnr", "knitr", "readxl", "DT", "rmarkdown")
+pacotes_usados_relatorio <- listar_pacotes(pacotes_relatorio)
+
+```
+
+Nas funções desenvolvidas neste trabalho, foram usados dos seguintes pacotes: `r pacotes_usados_funcoes`. Além destes, para a elaboração deste relatório também foi utilizado os pacotes `r pacotes_usados_relatorio`.
+
+
+
 ## Acessando os dados
 
 Para demonstrar como funciona o acesso manual no sistema InfoAguas, a seguir estão algumas _screenshots_ que demonstram o fluxo de navegação no site até que seja possível obter os dados.
@@ -72,7 +97,7 @@ Neste exemplo realizaremos a pesquisa por ponto de monitoramento, e por UGRHI, e
 
 
 ```{r echo=FALSE}
-knitr::include_graphics("images/infoaguas_5.png")
+knitr::include_graphics("images/infoaguas_5.PNG")
 ```
 
 4. Após clicar em "Buscar" o site direciona para uma página com uma tabela contendo informações sobre os pontos de monitoramento. É uma tabela interativa (feita com [DataTables](https://datatables.net/)), onde há um campo que possibilita pesquisar algum termo na tabela.   
@@ -119,7 +144,7 @@ knitr::include_graphics("images/infoaguas_9.png")
 
 
 ```{r echo=FALSE}
-knitr::include_graphics("images/infoaguas_10.png")
+knitr::include_graphics("images/infoaguas_10.PNG")
 ```
 
 Exemplo do arquivo obtido:
@@ -147,7 +172,16 @@ pesquisa_infoaguas_exemplo %>%
 
 ## Funções desenvolvidas
 
+A seguir, apresento uma breve descrição das funções desenvolvidas neste trabalho. 
+
 ### Autenticação no sistema
+
+O sistema InfoÁguas solicita login para acessar os dados. Portanto, primeiramente é necessário realizar a autentição.
+
+A função `login_infoaguas()` tem como argumentos o email (`login`) e a senha (`password`), e realiza a autenticação no sistema InfoAguas através de uma requisição do tipo `POST`.
+
+
+Obs: Nesta etapa foi necessário pedir ajuda aos professores!
 
 ```{r eval=FALSE, include=TRUE}
 login_infoaguas(login =  ... ,
@@ -156,7 +190,13 @@ login_infoaguas(login =  ... ,
 
 ### Obter pontos de coleta 
 
-> Explicar!
+Para possibilitar a realização das buscas para os pontos de monitoramento, é necessário ter informações sobre os pontos de monitoramento. A função `get_sampling_points()` realiza um Web Scraping e retorna uma base contendo informações sobre os pontos. Obs: Essa base será descrita posteriormente. Não é necessário informar argumentos para essa função.
+
+
+```{r eval=FALSE, include=TRUE}
+get_sampling_points() 
+```
+
 
 
 ### Buscar dados de qualidade da água
@@ -168,7 +208,6 @@ login_infoaguas(login =  ... ,
 ### Pontos de coleta
 
 ```{r message=FALSE, warning=FALSE}
-
 DT::datatable(sampling_points)
 ```
 
@@ -186,7 +225,7 @@ DT::datatable(sampling_points)
 ## Referências
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
-knitr::write_bib(c('Rpollution'), 'packages.bib')
+knitr::write_bib(c('Rpollution', pacotes_funcoes, pacotes_relatorio), 'packages.bib')
 ```
 
 <!-- This '<div id="refs"></div>' needs to 
