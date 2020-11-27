@@ -11,9 +11,10 @@ runtime: shiny_prerendered
 
 ```{r setup, include=FALSE}
 library(learnr)
-library(infoaguas)
+library(magrittr)
 knitr::opts_chunk$set(echo = TRUE, out.width="90%", fig.align = "center")
 tutorial_options(exercise.cap = "Código")
+sampling_points <- readr::read_csv2("sampling_points.csv")
 ```
 
 **Trabalho final para o curso '[Web Scraping](https://www.curso-r.com/cursos/web-scraping/)'**. <br>
@@ -30,25 +31,119 @@ Boas vindas! Esta página corresponde ao trabalho final para o curso [Web Scrapi
 
 > Falar da dificuldade para obter dados da qualidade da água/ambientais
 
-A Companhia Ambiental do Estado de São Paulo (CETESB) é a agência ambiental responsável pelo desenvolvimento de ações de controle, licenciamento, fiscalização e monitoramento das atividades potencialmente poluidoras no Estado de São Paulo[*](https://www.saopaulo.sp.gov.br/orgaos-e-entidades/empresas/cetesb/). Esta agência realiza o monitoramento da qualidade das águas das praias, rios, represas, do ar e do solo no Estado de São Paulo.
+A Companhia Ambiental do Estado de São Paulo (CETESB) é a agência ambiental responsável pelo desenvolvimento de ações de controle, licenciamento, fiscalização e monitoramento das atividades potencialmente poluidoras no Estado de São Paulo[*](https://www.saopaulo.sp.gov.br/orgaos-e-entidades/empresas/cetesb/). Essa agência realiza o monitoramento da qualidade das águas das praias, rios, represas, do ar e do solo no Estado de São Paulo.
 
 > Falar da estrutura de monitoramento  da CETESB
 
 
 Os dados referentes ao monitoramento da qualidade do ar são disponibilizados no sistema [Qualar](https://cetesb.sp.gov.br/ar/qualar/), e o sistema [InfoAguas](https://cetesb.sp.gov.br/infoaguas/) disponibiliza dados referentes à qualidade da água. Entretanto, não existe uma API (_Application Programming Interface_) pública para acesso dessas informações, e ambos os sistemas foram elaborados de forma que obter informações para um amplo recorte espacial e temporal seja trabalhoso, requerendo bastante trabalho manual.  
 
-O pacote [`Rpollution`](https://github.com/williamorim/Rpollution), desenvolvido por @R-Rpollution,  disponibiliza funções para obter os dados do sistema Qualar utilizando a linguagem de programação R e técnicas de Web Scraping. Entretanto, não foi encontrado alguma ferramenta similar para obtenção dos dados disponibilizados no sistema InfoAguas. Portanto, o objetivo deste trabalho foi desenvolver funções que possibilitem acessar os dados disponibilizados no sistema InfoAguas, para que pessoas pesquisadoras, jornalistas, e outras interessadas possam ter acesso à estes dados de forma automatizada. Ao final, para exemplificar o uso dos dados obtidos, uma breve análise descritiva será realizada com os dados de qualidade da água no território da Macrometrópole Paulista.
+O pacote [`Rpollution`](https://github.com/williamorim/Rpollution), desenvolvido por @R-Rpollution,  disponibiliza funções para obter os dados do sistema Qualar utilizando a linguagem de programação R e técnicas de Web Scraping. Entretanto, não foi encontrado alguma ferramenta similar para obtenção dos dados disponibilizados no sistema InfoAguas. Portanto, __o objetivo deste trabalho foi desenvolver funções que possibilitem acessar os dados disponibilizados no sistema InfoAguas para Águas Superficiais__, para que pessoas pesquisadoras, jornalistas, e outras interessadas possam ter acesso à estes dados de forma automatizada. Ao final, para exemplificar o uso dos dados obtidos, __uma breve análise descritiva será realizada com os dados de qualidade da água no território da Macrometrópole Paulista__.
 
 ## Acessando os dados
 
-Para demonstrar como funciona o acesso no sistema InfoAguas, a seguir estão algumas _screenshots_ que demonstram o fluxo de navegação no site até que seja possível obter os dados.
+Para demonstrar como funciona o acesso manual no sistema InfoAguas, a seguir estão algumas _screenshots_ que demonstram o fluxo de navegação no site até que seja possível obter os dados.
 
-1. 
+1. Ao acessar o Sistema INFOAGUAS (através do link https://sistemainfoaguas.cetesb.sp.gov.br/ ), é solicitado a autenticação através de login e senha. Caso não tenha um cadastro, é possível realizar através do botão "Novo Usuário".
 
 ```{r echo=FALSE}
 knitr::include_graphics("images/infoaguas_login.png")
 ```
 
+2. Após a autenticação, o site direciona para uma página de boas vindas. Para acessar os dados referentes à Águas Superficiais (como rios e reservatórios), é necessário clicar em: "Águas Superficiais > Consultas e Relatórios > Qualidade das Águas Superficiais".
+
+```{r echo=FALSE}
+knitr::include_graphics("images/infoaguas_3.PNG")
+```
+
+3. O site direciona para uma página com um formulário de pesquisa, onde é possível fazer a pesquisa:
+  - Por ponto de monitoramento
+  - Por parâmetro.
+  
+
+
+Neste mesmo formlário,  é possível filtrar por:
+  - Todos (sem filtro)
+  - UGRHI (Unidade de Gerenciamento de Recursos Hídricos. Por exemplo: Alto Tietê)
+  - Sistema Hídrico (por exemplo: Represa Billings)
+  - Município
+  
+Neste exemplo realizaremos a pesquisa por ponto de monitoramento, e por UGRHI, escolhendo Alto Tietê.
+
+
+```{r echo=FALSE}
+knitr::include_graphics("images/infoaguas_5.png")
+```
+
+4. Após clicar em "Buscar" o site direciona para uma página com uma tabela contendo informações sobre os pontos de monitoramento. É uma tabela interativa (feita com [DataTables](https://datatables.net/)), onde há um campo que possibilita pesquisar algum termo na tabela.   
+
+
+```{r echo=FALSE}
+knitr::include_graphics("images/infoaguas_7.png")
+```
+5. Neste exemplo, a pesquisa foi feita  com o termo 'Billings', para buscar pontos de monitoramento no Reservatório Billings, resultando em 4 pontos.
+
+```{r echo=FALSE}
+knitr::include_graphics("images/infoaguas_8.png")
+```
+
+```{r include=FALSE}
+n_pesquisas <-
+  sampling_points %>% dplyr::filter(sist_hidrico == "Reservatório Billings") %>%
+  dplyr::mutate(
+    data_final = dplyr::case_when(is.na(data_fim) ~ Sys.Date(),
+                                  TRUE ~ data_fim),
+    tempo_operacao = data_final - data_inicio,
+    anos_operacao = as.double(tempo_operacao / 365),
+    pesquisas = ceiling(anos_operacao / 5)
+  )
+
+total_pesquisas_billings <-
+  n_pesquisas %>% dplyr::summarise(sum(pesquisas)) %>% dplyr::pull()
+
+```
+
+6. Ao selecionar o botão (radio button) correspondente ao ponto de monitoramento, é solicitado informar o período da consulta, preenchendo a data inicial e a data final. 
+
+> Importante destacar que o formulário limita este período para um intervalo de tempo de até 5 anos, o que implica que a obtenção de todos os dados disponíveis para a Represa Billings manualmente necessitaria que a pesquisa fosse feita `r total_pesquisas_billings` vezes! 
+
+
+
+
+```{r echo=FALSE}
+knitr::include_graphics("images/infoaguas_9.png")
+```
+
+
+7. Após informar um período válido, aparece uma caixa onde é possível realizar o download da base de dados em formato `.xlsx` .
+
+
+```{r echo=FALSE}
+knitr::include_graphics("images/infoaguas_10.png")
+```
+
+Exemplo do arquivo obtido:
+
+```{r echo=FALSE}
+knitr::include_graphics("images/infoaguas_dataset.PNG")
+```
+
+A base de dados disponibilizada neste exemplo apresenta medições referentes à diversos parâmetros: 
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+pesquisa_infoaguas_exemplo <- readxl::read_excel("pesquisa_infoaguas_exemplo.xlsx")
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+pesquisa_infoaguas_exemplo %>% 
+  janitor::clean_names() %>%
+  dplyr::group_by(tipo_parametro) %>%  
+  dplyr::distinct(parametro) %>% 
+  dplyr::arrange(tipo_parametro, parametro) %>% 
+  dplyr::relocate(tipo_parametro, .before = parametro) %>% 
+  dplyr::summarise(parametros = knitr::combine_words(parametro, and = "e ")) %>% 
+  knitr::kable(col.names = c("Tipo de parâmetro", "Parâmetros"))
+```
 
 ## Funções desenvolvidas
 
@@ -72,7 +167,8 @@ login_infoaguas(login =  ... ,
 
 ### Pontos de coleta
 
-```{r}
+```{r message=FALSE, warning=FALSE}
+
 DT::datatable(sampling_points)
 ```
 

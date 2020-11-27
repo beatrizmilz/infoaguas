@@ -1,0 +1,12 @@
+name: trabalho_final
+title: trabalho_final
+username:
+account: beatriz-milz
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 3310494
+bundleId: 3912335
+url: https://beatriz-milz.shinyapps.io/trabalho_final/
+when: 1606477068.08556
+asMultiple: FALSE
+asStatic: FALSE

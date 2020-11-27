@@ -22,7 +22,7 @@ h1, h2, h3{
 
 body{
   font-family: 'Montserrat', sans-serif;
-  font-size: 14;
+  font-size: 16px;
 }
 
 
@@ -61,5 +61,5 @@ code {
 
 
 td, th {
-  font-size: 8px;
+  font-size: 10px;
 }

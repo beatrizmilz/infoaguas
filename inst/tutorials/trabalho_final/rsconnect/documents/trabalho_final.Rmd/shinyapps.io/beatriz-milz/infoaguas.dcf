@@ -1,0 +1,12 @@
+name: infoaguas
+title: infoaguas
+username:
+account: beatriz-milz
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 3310466
+bundleId: 3912314
+url: https://beatriz-milz.shinyapps.io/infoaguas/
+when: 1606476538.02275
+asMultiple: FALSE
+asStatic: FALSE
