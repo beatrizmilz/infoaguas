@@ -21,11 +21,15 @@ while(length(todos_codigos) > length(arquivos_baixados) + 1){
   arquivos_faltantes <- sampling_points %>%
     dplyr::anti_join(codigos_baixados , by = c("cod_interaguas" = "value"))
 
-  # View(arquivos_faltantes)
-
   codigos_faltantes <- arquivos_faltantes$cod_interaguas
 
 
   get_all_results(codigos_faltantes, "inst/download/")
 }
 
+
+# Depois de baixar todos, criar um df único
+
+dados_infoaguas <- tidy_infoaguas("inst/download/")
+
+usethis::use_data(dados_infoaguas, overwrite = TRUE)
