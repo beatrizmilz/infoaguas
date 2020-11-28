@@ -1,44 +1,35 @@
-get_all_results <- function(vetor_pontos, path_download) {
-  # future::plan(future::multisession)
-
-  hoje <- format(Sys.Date(), "%d-%m-%Y")
+maybe_get_results <-
+  purrr::possibly(get_results, otherwise = "Erro")
 
 
-  inicial <- paste0("01-01-", c(seq(
-    from = 1974, to = 2020, by = 5
-  )))
-
-
-  final <-
-    c(paste0("31-12-", c(seq(
-      from = 1979, to = 2020, by = 5
-    ) - 1)),
-    hoje)
-
-
-  for (i in 1:length(inicial)) {
-
-    inicial_busca <- inicial[i]
-    final_busca <- final[i]
-
-    # furrr::future_map(
-    #   .x = vetor_pontos,
-    #   .f = get_results,
-    #   start = inicial_busca,
-    #   end = final_busca,
-    #   path = path_download
-    # )
-
-    purrr::map(
-      .x = vetor_pontos,
-      .f = get_results,
-      start = inicial_busca,
-      end = final_busca,
-      path = path_download
-    )
-  }
+maybe_get_results_progresso <- function(points, path, prog) {
+  if (!missing(prog))
+    prog()
+  maybe_get_results(points, path)
+}
 
 
 
+#' Title
+#'
+#' @param points
+#' @param path
+#'
+#' @return
+#' @export
+#'
+#' @examples
+get_all_results <-  function(points, path) {
+  # coloca o script no contexto
+  progressr::with_progress({
+    # cria a barra de progresso
+    p <- progressr::progressor(length(points))
 
+    purrr::walk(points,
+                maybe_get_results_progresso,
+                path = path,
+                prog = p)
+
+
+  })
 }
