@@ -3,7 +3,7 @@
 
 # todos_codigos <- unique(sampling_points$cod_interaguas)
 
-# pontos_billings <- sampling_points %>% dplyr::filter(sist_hidrico == "Reservatório Billings") %>% dplyr::pull(cod_interaguas)
+# pontos_billings <- vetor_pontos <- sampling_points %>% dplyr::filter(sist_hidrico == "Reservatório Billings") %>% dplyr::pull(cod_interaguas)
 
 # get_all_results(pontos_billings, "inst/download/")
 
