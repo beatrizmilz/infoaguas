@@ -38,22 +38,32 @@ get_results <- function(sampling_point, start, end, path) {
                         body = body_busca,
                         encode = "form")
 
-  httr::content(r_busca)
+  resposta <- httr::content(r_busca) %>% xml2::xml_text()
 
+  if (resposta == "success") {
+    start_2 <- stringr::str_replace_all(start, "/", "-")
 
-  start_2 <- stringr::str_replace_all(start, "/", "-")
+    end_2 <- stringr::str_replace_all(end, "/", "-")
 
-  end_2 <- stringr::str_replace_all(end, "/", "-")
+    arquivo <-
+      glue::glue("{path}infoaguas_{sampling_point}_start-{start_2}_end-{end_2}.xlsx")
 
-  arquivo <-
-    glue::glue("{path}infoaguas_{sampling_point}_start-{start_2}_end-{end_2}.xlsx")
-
-  r_monitoramento <-
-    httr::GET(
-      "https://sistemainfoaguas.cetesb.sp.gov.br/AguasSuperficiais/RelatorioQualidadeAguasSuperficiais/Download",
-      httr::write_disk(arquivo, overwrite = TRUE)
-    )
-  message(glue::glue("O arquivo foi baixado e pode ser encontrado em:
+    r_monitoramento <-
+      httr::GET(
+        "https://sistemainfoaguas.cetesb.sp.gov.br/AguasSuperficiais/RelatorioQualidadeAguasSuperficiais/Download",
+        httr::write_disk(arquivo, overwrite = TRUE)
+      )
+    message(glue::glue("O arquivo foi baixado e pode ser encontrado em:
                      {arquivo}"))
+  } else {
+    message(
+      glue::glue(
+        "Arquivo não baixado, referente ao ponto {sampling_point} nos períodos {start} a {end}."
+      )
+    )
+  }
+
+
+
 
 }

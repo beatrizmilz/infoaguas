@@ -14,21 +14,12 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
-#library(infoaguas)
-```
 
 ```{r}
 infoaguas::login_infoaguas(login = Sys.getenv("CETESB_LOGIN"), 
                  password =  Sys.getenv("CETESB_PWD"))
 
 ```
-```{r}
-get_results(sampling_point = 106, start = "01/01/2016", end = "27-11-2020", path = "inst/download/")
-```
-
-
-
 Temas de aula para aplicar/Roadmap:
 
 - Aula 1 à 3:
@@ -40,13 +31,11 @@ Temas de aula para aplicar/Roadmap:
 
 - Aula 4: 
   - [ ] Tratamento de erros - possibly/safely
-  - [ ] Programação funcional - purrr (ou furrr)
-  - [ ] Paralelização - pacote furrr
+  - [x] Programação funcional - purrr (ou furrr)
+  - [x] Paralelização - pacote furrr
   - [ ] Barras de progresso - pacote progressr
   - [ ] Tempo que demora para funcionar - pacote tictoc 
 
-
-- Aula 6:
 
 
 Anotações para mim mesma:
