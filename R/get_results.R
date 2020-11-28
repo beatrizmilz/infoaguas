@@ -1,21 +1,11 @@
-get_results <- function(sampling_point, start, end) {
+get_results <- function(sampling_point, start, end, path) {
   `%>%` <- magrittr::`%>%`
-
-
-  # n_ugrhi <- 6
-  sampling_point <- 106
-  start <- "01/01/2020"
-  end <- "25/11/2020"
-
 
   u_busca <-
     "https://sistemainfoaguas.cetesb.sp.gov.br/AguasSuperficiais/RelatorioQualidadeAguasSuperficiais"
 
 
   res <- httr::GET(u_busca)
-
-  cookies <- httr::cookies(res)$value %>%
-    purrr::set_names(httr::cookies(res)$name)
 
 
   body_busca <- list(
@@ -26,7 +16,8 @@ get_results <- function(sampling_point, start, end) {
   )
 
 
-  r_busca <- httr::POST(u_busca, body = body_busca, encode = "form",  httr::set_cookies(cookies))
+  r_busca <-
+    httr::POST(u_busca, body = body_busca, encode = "form")
 
 
   u_busca <-
@@ -44,24 +35,25 @@ get_results <- function(sampling_point, start, end) {
 
 
   r_busca <- httr::POST(u_busca,
-                        #   query = list(method = "pesquisar"),
                         body = body_busca,
-                        encode = "form"#,
+                        encode = "form")
 
-                        #  httr::accept("xlsx")
-                        ,
-                        httr::set_cookies(cookies))
+  httr::content(r_busca)
 
 
+  start_2 <- stringr::str_replace_all(start, "/", "-")
+
+  end_2 <- stringr::str_replace_all(end, "/", "-")
+
+  arquivo <-
+    glue::glue("{path}infoaguas_{sampling_point}_start-{start_2}_end-{end_2}.xlsx")
 
   r_monitoramento <-
     httr::GET(
-      "https://sistemainfoaguas.cetesb.sp.gov.br/AguasSuperficiais/RelatorioQualidadeAguasSuperficiais/MonitoramentoModal",
-      httr::write_disk("inst/temp.html", overwrite = TRUE)
+      "https://sistemainfoaguas.cetesb.sp.gov.br/AguasSuperficiais/RelatorioQualidadeAguasSuperficiais/Download",
+      httr::write_disk(arquivo, overwrite = TRUE)
     )
-
-
-  # Até aqui: o html pede para fazer a busca pela data (mas já fiz....) (?)
-
+  message(glue::glue("O arquivo foi baixado e pode ser encontrado em:
+                     {arquivo}"))
 
 }

@@ -24,16 +24,10 @@ infoaguas::login_infoaguas(login = Sys.getenv("CETESB_LOGIN"),
 
 ```
 ```{r}
-dplyr::glimpse(sampling_points)
+get_results(sampling_point = 106, start = "01/01/2016", end = "27-11-2020", path = "inst/download/")
 ```
-Análise:
-- Pontos em operação
-- MMP (Delimitação EMPLASA)
 
-```{r include=FALSE}
-sampling_points %>% 
-  dplyr::filter(is.na(data_fim))
-```
+
 
 Temas de aula para aplicar/Roadmap:
 

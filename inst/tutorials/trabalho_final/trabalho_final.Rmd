@@ -21,6 +21,9 @@ sampling_points <- readr::read_csv2("sampling_points.csv")
 **[Beatriz Milz](https://beatrizmilz.com)**   <a href='mailto:beatriz.milz@usp.br'><i class="far fa-envelope"></i></a>   <a href='https://twitter.com/BeaMilz'  target="_blank"><i class="fab fa-twitter"></i></a>   <a href='https://github.com/beatrizmilz' target="_blank"><i class="fab fa-github"></i></a>   <a href='https://orcid.org/0000-0002-3064-4486' target="_blank"><i class="fab fa-orcid"></i></a>   <a href='http://lattes.cnpq.br/5150665880581477' target="_blank"><i class="ai ai-lattes"></i></a>   <a href='https://beatrizmilz.github.io/resume/index.html' target="_blank"><i class="ai ai-cv"></i></a>   <a href='https://discourse.curso-r.com/u/beatrizmilz/summary' target="_blank"><i class="fab fa-discourse"></i></a> 
 <br>
 
+<!-- Place this tag where you want the button to render. -->
+<a class="github-button" href="https://github.com/beatrizmilz/infoaguas" aria-label="Acesse o repositório no GitHub">Acesse o repositório no GitHub</a>
+
 Atualizado em `r format(Sys.Date(), format='%d de %B de %Y')`.
 
 ## Contextualização
@@ -189,7 +192,7 @@ A seguir, apresento uma breve descrição das funções desenvolvidas neste trab
 
 O sistema InfoÁguas solicita login para acessar os dados. Portanto, primeiramente é necessário realizar a autentição.
 
-A função `login_infoaguas()` tem como argumentos o email (`login`) e a senha (`password`), e realiza a autenticação no sistema Infoaguas através de uma requisição do tipo `POST`.
+A função [`login_infoaguas()`](https://github.com/beatrizmilz/infoaguas/blob/master/R/login_infoaguas.R) tem como argumentos o email (`login`) e a senha (`password`), e realiza a autenticação no sistema Infoaguas através de uma requisição do tipo `POST`.
 
 
 Obs: Nesta etapa foi necessário pedir ajuda aos professores!
@@ -201,7 +204,7 @@ login_infoaguas(login =  ... ,
 
 ### Obter pontos de coleta 
 
-Para possibilitar a realização das buscas para os pontos de monitoramento, é necessário ter informações sobre os pontos de monitoramento. A função `get_sampling_points()` realiza um Web Scraping e retorna uma base contendo informações sobre os pontos. Obs: Essa base será descrita posteriormente. Não é necessário informar argumentos para essa função.
+Para possibilitar a realização das buscas para os pontos de monitoramento, é necessário ter informações sobre os pontos de monitoramento. A função [`get_sampling_points()`](https://github.com/beatrizmilz/infoaguas/blob/master/R/get_sampling_points.R) realiza um Web Scraping e retorna uma base contendo informações sobre os pontos. Obs: Essa base será descrita posteriormente. Não é necessário informar argumentos para essa função.
 
 
 ```{r eval=FALSE, include=TRUE}
@@ -232,14 +235,20 @@ DT::datatable(sampling_points)
 
 > Em breve!
 
-## Agradecimentos
+## Conclusões
+
+### Próximos passos
+
+> Em breve!
+
+### Agradecimentos
 
 - [Post sobre o scraper do QUALAR](https://www.curso-r.com/blog/2018-03-19-scraper-cetesb/) - Por William Amorim
 
-## Referências
+### Referências
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
-knitr::write_bib(c('Rpollution', pacotes_funcoes, pacotes_relatorio), 'packages.bib')
+# knitr::write_bib(c('Rpollution', pacotes_funcoes, pacotes_relatorio), 'packages.bib')
 ```
 
 <!-- This '<div id="refs"></div>' needs to 
@@ -248,3 +257,5 @@ otherwise you can remove it.-->
 <div id="refs"></div> 
 
 
+<!-- Place this tag in your head or just before your close body tag. -->
+<script async defer src="https://buttons.github.io/buttons.js"></script>
