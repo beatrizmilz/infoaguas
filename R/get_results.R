@@ -1,3 +1,4 @@
+
 #' Title
 #'
 #' @param sampling_point
@@ -7,7 +8,6 @@
 #' @export
 #'
 #' @examples
-#'
 get_results <- function(sampling_point, path) {
   `%>%` <- magrittr::`%>%`
 
@@ -16,6 +16,14 @@ get_results <- function(sampling_point, path) {
     dplyr::filter(cod_interaguas == sampling_point) %>%
     dplyr::pull(data_inicio) %>%
     format("%d-%m-%Y")
+
+  # ponto_mais_antigo <- sampling_points %>%
+  #   dplyr::arrange(data_inicio) %>%
+  #   dplyr::slice(1) %>%
+  #   dplyr::pull(data_inicio)
+
+  if(is.na(data_inicio_ponto)){data_inicio_ponto <- "01-01-1974"}
+
 
 
   data_final <- format(Sys.Date(), "%d-%m-%Y")
