@@ -5,8 +5,9 @@ account: beatriz-milz
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 3310494
-bundleId: 3914419
+bundleId: 3917557
 url: https://beatriz-milz.shinyapps.io/trabalho_final/
-when: 1606522707.06027
+when: 1606613446.08224
 asMultiple: FALSE
 asStatic: FALSE
+ignoredFiles: billings/infoaguas_1386_start-01-01-2007_end-28-11-2020.xlsx|billings/infoaguas_139_start-01-01-1976_end-28-11-2020.xlsx|billings/infoaguas_140_start-01-01-1976_end-28-11-2020.xlsx|billings/infoaguas_146_start-01-01-1999_end-28-11-2020.xlsx

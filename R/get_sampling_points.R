@@ -73,7 +73,6 @@ get_sampling_points <- function() {
 
     join_code_muni
 
-    tabela_pontos
   } else {
     stop(
       "Você precisa realizar a autenticação antes de utilizar essa função.

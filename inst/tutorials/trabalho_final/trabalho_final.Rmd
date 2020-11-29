@@ -5,7 +5,7 @@ output:
     css: css/custom.css
     progressive: false
     allow_skip: true
-bibliography: [packages.bib]
+bibliography: [packages.bib, zotero.bib]
 runtime: shiny_prerendered
 ---
 
@@ -15,6 +15,7 @@ library(magrittr)
 knitr::opts_chunk$set(echo = TRUE, out.width="90%", fig.align = "center")
 tutorial_options(exercise.cap = "Código")
 sampling_points <- readr::read_csv2("sampling_points.csv")
+dados_billings <- readr::read_csv2("dados_billings.csv")
 ```
 
 **Trabalho final para o curso '[Web Scraping](https://www.curso-r.com/cursos/web-scraping/)'**. <br>
@@ -32,7 +33,16 @@ Boas vindas! Esta página corresponde ao trabalho final para o curso [Web Scrapi
 
 ### Introdução
 
-> Falar da dificuldade para obter dados da qualidade da água/ambientais
+O monitoramento ambiental é, segundo a [Empresa Brasileira de Pesquisa Agropecuária (EMBRAPA)](http://www.agencia.cnptia.embrapa.br/gestor/cana-de-acucar/arvore/CONTAG01_73_711200516719.html),   "um processo de coleta de dados, estudo e acompanhamento contínuo e sistemático das variáveis ambientais, com o objetivo de identificar e avaliar - qualitativa e quantitativamente - as condições dos recursos naturais em um determinado momento, assim como as tendências ao longo do tempo".
+
+A coleta de dados ambientais é representada na figura a seguir como a primeira etapa em um workflow de Ciência de Dados Ambientais (tradução do chamado de _Environmental Data Science_ por Horst). A etapa de coleta de dados é muito importante, abrangendo diferentes tecnologias: por sensoriamento remoto, através de estações meteorológicas automáticas, coletas _in situ_, entre outros.
+
+```{r echo=FALSE, fig.cap="Figura: Versão expandida do ciclo da Ciência de dados, por @wickhamR4DS2017. Fonte: Ilustração por <a href='https://github.com/allisonhorst/stats-illustrations'>Allison Horst</a>."}
+knitr::include_graphics("https://raw.githubusercontent.com/allisonhorst/stats-illustrations/master/openscapes/environmental-data-science-r4ds-general.png")
+```
+
+
+A coleta de amostras de águas superficiais é realizado _in situ_, ou seja, no local. Essas coletas e a posterior análise em laboratório das amostras são custosas para serem realizadas: requerem uma equipe para coletar e  analisar as amostras, barcos para acessar os pontos, materiais e equipamentos, entre outros. Tanto a coleta quanto a análise das amostras de águas superficiais requerem critérios e metodologias específicas (é possível saber mais [neste guia](https://www.researchgate.net/publication/275351750_Guia_Nacional_de_coleta_e_Preservacao_de_amostras_Agua_Sedimento_Comunidades_Aquaticas_e_efluentes_liquidos)). 
 
 A Companhia Ambiental do Estado de São Paulo (CETESB) é a agência ambiental responsável pelo desenvolvimento de ações de controle, licenciamento, fiscalização e monitoramento das atividades potencialmente poluidoras no Estado de São Paulo[*](https://www.saopaulo.sp.gov.br/orgaos-e-entidades/empresas/cetesb/). Essa agência realiza o monitoramento da qualidade das águas das praias, rios, represas, do ar e do solo no Estado de São Paulo.
 
@@ -63,11 +73,11 @@ listar_pacotes <- function(vetor){
   
 }
 
-pacotes_funcoes <- c("httr", "magrittr", "xml2", "purrr", "dplyr", "rvest", "janitor", "tibble")
+pacotes_funcoes <- c("httr", "magrittr", "xml2", "purrr", "dplyr", "rvest", "janitor", "tibble", "progressr", "stringr", "lubridate", "glue", "abjutils", "readr")
 pacotes_usados_funcoes <- listar_pacotes(pacotes_funcoes)
 
 
-pacotes_relatorio <- c("learnr", "knitr", "readxl", "DT", "rmarkdown", "glue", "sf")
+pacotes_relatorio <- c("learnr", "knitr", "readxl", "DT", "rmarkdown","usethis", "geobr" , "sf")
 pacotes_usados_relatorio <- listar_pacotes(pacotes_relatorio)
 
 ```
@@ -167,8 +177,8 @@ Exemplo do arquivo obtido:
 knitr::include_graphics("images/infoaguas_dataset.PNG")
 ```
 
-A base de dados disponibilizada neste exemplo apresenta medições referentes à diversos parâmetros: 
-
+A base de dados disponibilizada neste exemplo apresenta medições referentes à diversos parâmetros (porém na base completa existem mais parâmetros): 
+ 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 pesquisa_infoaguas_exemplo <- readxl::read_excel("pesquisa_infoaguas_exemplo.xlsx")
 ```
@@ -195,8 +205,6 @@ O sistema InfoÁguas solicita login para acessar os dados. Portanto, primeiramen
 A função [`login_infoaguas()`](https://github.com/beatrizmilz/infoaguas/blob/master/R/login_infoaguas.R) tem como argumentos o email (`login`) e a senha (`password`), e realiza a autenticação no sistema Infoaguas através de uma requisição do tipo `POST`.
 
 
-Obs: Nesta etapa foi necessário pedir ajuda aos professores!
-
 ```{r eval=FALSE, include=TRUE}
 login_infoaguas(login =  ... ,
                 password = ...)
@@ -204,22 +212,54 @@ login_infoaguas(login =  ... ,
 
 ### Obter pontos de coleta 
 
-Para possibilitar a realização das buscas para os pontos de monitoramento, é necessário ter informações sobre os pontos de monitoramento. A função [`get_sampling_points()`](https://github.com/beatrizmilz/infoaguas/blob/master/R/get_sampling_points.R) realiza um Web Scraping e retorna uma base contendo informações sobre os pontos. Obs: Essa base será descrita posteriormente. Não é necessário informar argumentos para essa função.
+Para possibilitar a realização das buscas de resultados de parâmetros para os pontos de monitoramento, é necessário ter informações sobre os pontos de monitoramento. A função [`get_sampling_points()`](https://github.com/beatrizmilz/infoaguas/blob/master/R/get_sampling_points.R) realiza um Web Scraping e retorna uma base contendo informações sobre os pontos. Obs: Essa base será descrita posteriormente. Não é necessário informar argumentos para essa função.
 
 
 ```{r eval=FALSE, include=TRUE}
 get_sampling_points() 
 ```
 
-
-
 ### Buscar dados de qualidade da água
-> Em breve!
+
+Para buscar os dados, foram desenvolvidas duas funções principais:
+
+- `get_results()`: tem como argumento o `sampling_point` (o número utilizado no sistema para se referir ao ponto de coleta), e o `path` (um diretório onde os arquivos baixados serão salvos). 
+
+```{r eval=FALSE, include=TRUE}
+get_results(sampling_point = ... , path = "..../")
+```
+
+- `get_all_results()`: tem como argumento `points`, sendo um vetor contendo os pontos de coleta a qual deseja obter os dados, e o `path` (um diretório onde os arquivos baixados serão salvos).  Internamente, essa função utiliza a função `get_results()` (descrita anteriormente). 
+
+
+```{r eval=FALSE, include=TRUE}
+get_all_results(points = ... , path = "..../")
+```
+
+### Arrumar as bases
+
+A última função desenvolvida se chama `tidy_infoaguas()`, e tem como argumento o `path`, sendo o diretório onde os arquivos foram salvos ao executar a função anterior. Essa função irá buscar todos os arquivos `.xlsx` neste diretório, irá ler os dados, e realizar algumas operações para limpar a base. A função retorna a base de dados arrumada.
+
+```{r eval=FALSE, include=TRUE}
+tidy_infoaguas(path = "..../")
+```
 
 
 ## Bases de dados obtidas
 
 ### Pontos de coleta
+
+A primeira base obtida é a dos pontos de coleta. Possui as seguintes variáveis:
+
+- `cod_ponto`: código do ponto de coleta apresentado no sistema Infoaguas.
+- `sist_hidrico`: sistema hídrico onde o ponto está localizado.
+- `localização`: texto que descreve onde o ponto de coleta está localizado.
+- `data_inicio` e `data_fim`: data de início e de fim da operação deste ponto de coleta. Na variável `data_fim`, `NA` representa um ponto de coleta que ainda está ativo.
+- `municipio` e `muni`: os dois correspondem ao nome do município onde o ponto está localizado.
+- `code_muni`: código do município segundo o IBGE.
+- `cod_interaguas`: código utilizado internamente no sistema, necessário para realizar as pesquisas.
+
+
 
 ```{r message=FALSE, warning=FALSE}
 DT::datatable(sampling_points)
@@ -227,8 +267,40 @@ DT::datatable(sampling_points)
 
 ### Dados de qualidade da água
 
-> Em breve!
+A base obtida utilizando as funções desenvolvidas neste trabalho apresenta dados para todos os pontos de monitoramento, para todos os parâmetros, em todo o período de operação. Por este motivo, a base tem quase 2 milhões de linhas. 
 
+
+Para não sobrecarregar o relatório, será apresentado uma tabela de exemplo conendo apenas os dados referentes à Represa Billings. Exemplo da busca:
+
+```{r eval=FALSE, message=FALSE, warning=FALSE, include=TRUE}
+# Autenticar
+infoaguas::login_infoaguas(login = Sys.getenv("CETESB_LOGIN"), 
+                 password =  Sys.getenv("CETESB_PWD"))
+
+# Definir os pontos para obter os dados
+codigos <-
+  sampling_points %>% 
+  dplyr::filter(sist_hidrico == "Reservatório Billings") %>%
+  dplyr::pull(cod_interaguas)
+
+# Definir o diretório onde serão salvos os arquivos
+path_billings <- "billings/"
+
+# Obter os arquivos em excel com dados para cada ponto
+get_all_results(codigos, path_billings)
+
+# Organizar todos os excel em uma base arrumada
+dados_billings <- tidy_infoaguas(path_billings)
+
+# Salvar esses dados em um csv
+readr::write_csv2(dados_billings, "dados_billings.csv")
+```
+
+A base de exemplo, contendo apenas os dados referentes à Represa Billings, possui cerca de  `r ceiling(nrow(dados_billings)/1000)` mil observações e `r ncol(dados_billings)` variáveis.
+
+```{r message=FALSE, warning=FALSE}
+DT::datatable(head(dados_billings))
+```
 
 
 ## Análise descritiva dos dados
@@ -237,13 +309,32 @@ DT::datatable(sampling_points)
 
 ## Conclusões
 
-### Próximos passos
+### Próximos passos/ Melhorias 
 
-> Em breve!
+- Não consegui utilizar o pacote `furrr` na função `get_all_results()`. Seria interessante corrigir isso pois deixaria a função mais rápida.
+
+- Padronizar nome das funções, argumentos, variáveis etc em um único idioma. Alguns escrevi em inglês, outros em português, tá bagunçado.
+
+- Documentar as funções!
+
+- Pensar em uma forma de disponibilizar para a comunidade. 
+
+- Desenvolvi funções para obter dados sobre o monitoramento das águas superficiais, porém no sistema existem também uma seção sobre águas subterrâneas. Seria interessante raspar também?
+
+
 
 ### Agradecimentos
 
+- Aos professores do curso pelas aulas maravilhosas: [Julio Trecenti](https://github.com/jtrecenti) e [Caio Lente](https://lente.dev/). 
+
 - [Post sobre o scraper do QUALAR](https://www.curso-r.com/blog/2018-03-19-scraper-cetesb/) - Por William Amorim
+
+- Para você que leu até aqui! 
+
+```{r echo=FALSE, out.width="50%"}
+knitr::include_graphics("https://media.giphy.com/media/3oz8xIsloV7zOmt81G/giphy.gif")
+```
+
 
 ### Referências
 
