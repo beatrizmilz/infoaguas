@@ -8,10 +8,9 @@
 #'
 #' @examples
 get_results <- function(sampling_point, path) {
-  `%>%` <- magrittr::`%>%`
 
-  data_inicio_ponto <-
-    sampling_points %>%
+    data_inicio_ponto <-
+    infoaguas::sampling_points %>%
     dplyr::filter(cod_interaguas == sampling_point) %>%
     dplyr::pull(data_inicio) %>%
     format("%d-%m-%Y")

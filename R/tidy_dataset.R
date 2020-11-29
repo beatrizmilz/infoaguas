@@ -35,7 +35,7 @@ tidy_infoaguas <- function(path) {
             "Coloração",
             "Chuvas nas últimas 24h",
             "Indução de Micronúcleos"
-          ) ~ valor,
+          ) ~ as.character(valor),
 
           TRUE ~ NA_character_
         ),

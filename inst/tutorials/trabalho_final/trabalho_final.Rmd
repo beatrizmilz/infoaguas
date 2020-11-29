@@ -12,10 +12,13 @@ runtime: shiny_prerendered
 ```{r setup, include=FALSE}
 library(learnr)
 library(magrittr)
+library(readr)
 knitr::opts_chunk$set(echo = TRUE, out.width="90%", fig.align = "center")
 tutorial_options(exercise.cap = "Código")
 sampling_points <- readr::read_csv2("sampling_points.csv")
-dados_billings <- readr::read_csv2("dados_billings.csv")
+dados_billings <- readr::read_delim("dados_billings.csv", 
+    ";", escape_double = FALSE, col_types = cols(valor_texto = col_character()), 
+    trim_ws = TRUE)
 ```
 
 **Trabalho final para o curso '[Web Scraping](https://www.curso-r.com/cursos/web-scraping/)'**. <br>
@@ -238,7 +241,7 @@ get_all_results(points = ... , path = "..../")
 
 ### Arrumar as bases
 
-A última função desenvolvida se chama `tidy_infoaguas()`, e tem como argumento o `path`, sendo o diretório onde os arquivos foram salvos ao executar a função anterior. Essa função irá buscar todos os arquivos `.xlsx` neste diretório, irá ler os dados, e realizar algumas operações para limpar a base. A função retorna a base de dados arrumada.
+A última função desenvolvida se chama `tidy_infoaguas()`, e tem como argumento o `path`, sendo o diretório onde os arquivos foram salvos ao executar a função anterior. Essa função irá buscar todos os arquivos `.xlsx` neste diretório, irá ler os dados, e realizar algumas operações para limpar a base. A função retorna a base de dados arrumada. A base já vem em formato tidy, sendo necessário apenas renomear o nome das colunas, e alterar o tipo de algumas colunas.
 
 ```{r eval=FALSE, include=TRUE}
 tidy_infoaguas(path = "..../")
@@ -252,11 +255,17 @@ tidy_infoaguas(path = "..../")
 A primeira base obtida é a dos pontos de coleta. Possui as seguintes variáveis:
 
 - `cod_ponto`: código do ponto de coleta apresentado no sistema Infoaguas.
+
 - `sist_hidrico`: sistema hídrico onde o ponto está localizado.
+
 - `localização`: texto que descreve onde o ponto de coleta está localizado.
+
 - `data_inicio` e `data_fim`: data de início e de fim da operação deste ponto de coleta. Na variável `data_fim`, `NA` representa um ponto de coleta que ainda está ativo.
+
 - `municipio` e `muni`: os dois correspondem ao nome do município onde o ponto está localizado.
+
 - `code_muni`: código do município segundo o IBGE.
+
 - `cod_interaguas`: código utilizado internamente no sistema, necessário para realizar as pesquisas.
 
 
@@ -267,7 +276,92 @@ DT::datatable(sampling_points)
 
 ### Dados de qualidade da água
 
-A base obtida utilizando as funções desenvolvidas neste trabalho apresenta dados para todos os pontos de monitoramento, para todos os parâmetros, em todo o período de operação. Por este motivo, a base tem quase 2 milhões de linhas. 
+A base obtida utilizando as funções desenvolvidas neste trabalho apresenta dados para todos os pontos de monitoramento, para todos os parâmetros, em todo o período de operação. Por este motivo, a base tem quase 2 milhões de observações, contendo as seguintes variáveis:
+
+- `periodo_de` e `periodo_ate`: período da pesquisa. 
+
+- `cod_interaguas`: código utilizado internamente no sistema, necessário para realizar as pesquisas.
+
+- `tipo_rede`: Tipo de rede de monitoramento. Ex: Rede Básica.
+
+- `ugrhi`: Unidade de Gerenciamento de Recursos Hídricos onde o ponto está localizado.
+
+- `codigo_ponto`: código do ponto de coleta apresentado no sistema Infoaguas.
+
+- `status_ponto`: informa se o ponto está ativo atualmente ou não.
+
+- `data_coleta` e `hora_coleta`: informações de quando a amostra foi coletada.
+
+- `parametro`: parâmetro analisado. Ex. temperatura da água, oxigênio dissolvido, etc.
+
+- `sinal`: alguns parâmetros apresentam sinal (Ex. menor que, maior que) junto ao resultado obtido na 
+análise do parâmetro.
+
+- `valor`: valor resultante do parâmetro. É a coluna original.
+
+- `valor_numerico`: valor resultante para os parâmetros que tem resultados numéricos. Coluna criada na etapa de limpeza dos dados.
+
+- `valor_texto`: valor resultante para os parâmetros que tem resultados de texto. Coluna criada na etapa de limpeza dos dados.
+
+- `unidade`: unidade de medida do valor resultante.
+
+- `tipo_parametro`: Categoria do parâmetro (ex. Físico, Químico, Biológico, etc)
+
+- `sistema_hidrico`: corpo hídrico onde a amostra foi coletada.
+
+- `tipo_de_sistema_hidrico`: O tipo de sistema hídrico. Ex: Reservatório ou Rio.
+
+- `classe`: classe do `sistema_hidrico` segundo a [Resolução CONAMA nº 357/2005](http://www2.mma.gov.br/port/conama/legiabre.cfm?codlegi=459).
+
+- `municipio`:  nome do município onde o ponto de coleta está localizado.
+
+- `uf`: estado brasileiro onde o ponto está localizado.
+
+- `inicio_operacao` e `fim_operacao`: data de início e de fim da operação deste ponto de coleta. Na variável `fim_operacao`, `NA` representa um ponto de coleta que ainda está ativo.
+
+- `latitude` e `longitude`: Latitude e Longitude do ponto de coleta.
+
+- `altitude`: altitude do ponto de coleta.
+
+- `localização`: texto que descreve onde o ponto de coleta está localizado.
+
+- `captacao`: Averiguar. Creio que está relacionado à proximidade de um ponto de captação de água para consumo humano, porém não está muito claro.
+
+
+```{r eval=FALSE, include=TRUE}
+dplyr::glimpse(dados_infoaguas)
+# Rows: 1,921,122
+# Columns: 28
+# $ periodo_de              <date> 1977-11-01, 1977-11-01, 1977-11-01, 1977-11-01, 1977-11-01, ...
+# $ periodo_ate             <date> 2020-11-28, 2020-11-28, 2020-11-28, 2020-11-28, 2020-11-28, ...
+# $ cod_interaguas          <chr> "100", "100", "100", "100", "100", "100", "100", "100", "100"...
+# $ tipo_rede               <chr> "Rede Básica", "Rede Básica", "Rede Básica", "Rede Básica", "...
+# $ ugrhi                   <chr> "06 - ALTO TIÊTE", "06 - ALTO TIÊTE", "06 - ALTO TIÊTE", "06 ...
+# $ codigo_ponto            <chr> "COGR00900", "COGR00900", "COGR00900", "COGR00900", "COGR0090...
+# $ status_ponto            <chr> "Ativo", "Ativo", "Ativo", "Ativo", "Ativo", "Ativo", "Ativo"...
+# $ data_coleta             <date> 1978-01-01, 1978-04-01, 1978-05-01, 1978-07-01, 1978-09-01, ...
+# $ hora_coleta             <Period> 12H 0M 0S, 12H 0M 0S, 12H 0M 0S, 12H 0M 0S, 12H 0M 0S, 12H...
+# $ parametro               <chr> "pH", "pH", "pH", "pH", "pH", "pH", "pH", "pH", "pH", "pH", "...
+# $ sinal                   <chr> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N...
+# $ valor                   <chr> "6,40000000", "7,20000000", "6,80000000", "6,50000000", "6,50...
+# $ valor_numerico          <dbl> 6.4, 7.2, 6.8, 6.5, 6.5, 6.7, 6.6, 6.9, 6.4, 6.4, 6.8, 5.0, 6...
+# $ valor_texto             <chr> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N...
+# $ unidade                 <chr> "U.pH", "U.pH", "U.pH", "U.pH", "U.pH", "U.pH", "U.pH", "U.pH...
+# $ tipo_parametro          <chr> "3- Químicos", "3- Químicos", "3- Químicos", "3- Químicos", "...
+# $ sistema_hidrico         <chr> "Reservatório das Graças - COGR", "Reservatório das Graças - ...
+# $ tipo_de_sistema_hidrico <chr> "Reservatório (Lêntico)", "Reservatório (Lêntico)", "Reservat...
+# $ classe                  <chr> "Classe Especial", "Classe Especial", "Classe Especial", "Cla...
+# $ municipio               <chr> "COTIA", "COTIA", "COTIA", "COTIA", "COTIA", "COTIA", "COTIA"...
+# $ uf                      <chr> "SP", "SP", "SP", "SP", "SP", "SP", "SP", "SP", "SP", "SP", "...
+# $ inicio_operacao         <date> 1977-11-01, 1977-11-01, 1977-11-01, 1977-11-01, 1977-11-01, ...
+# $ fim_operacao            <date> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, ...
+# $ latitude                <chr> "23 39 12", "23 39 12", "23 39 12", "23 39 12", "23 39 12", "...
+# $ longitude               <chr> "46 58 03", "46 58 03", "46 58 03", "46 58 03", "46 58 03", "...
+# $ altitude                <dbl> 865, 865, 865, 865, 865, 865, 865, 865, 865, 865, 865, 865, 8...
+# $ localizacao             <chr> "Na barragem, junto à captação do Alto Cotia", "Na barragem, ...
+# $ captacao                <chr> "S", "S", "S", "S", "S", "S", "S", "S", "S", "S", "S", "S", "...
+```
+
 
 
 Para não sobrecarregar o relatório, será apresentado uma tabela de exemplo conendo apenas os dados referentes à Represa Billings. Exemplo da busca:
@@ -282,7 +376,7 @@ codigos <-
   sampling_points %>% 
   dplyr::filter(sist_hidrico == "Reservatório Billings") %>%
   dplyr::pull(cod_interaguas)
-
+Reservatório do Guarapiranga
 # Definir o diretório onde serão salvos os arquivos
 path_billings <- "billings/"
 
@@ -298,14 +392,33 @@ readr::write_csv2(dados_billings, "dados_billings.csv")
 
 A base de exemplo, contendo apenas os dados referentes à Represa Billings, possui cerca de  `r ceiling(nrow(dados_billings)/1000)` mil observações e `r ncol(dados_billings)` variáveis.
 
+
+
 ```{r message=FALSE, warning=FALSE}
 DT::datatable(head(dados_billings))
+```
+
+```{r message=FALSE, warning=FALSE}
+library(leaflet)
+
+dados_billings %>% 
+  tidyr::separate(latitude, into = c("lat_graus", "lat_min", "lat_sec"), sep = " ", remove = FALSE) %>% 
+  tidyr::separate(longitude, into = c("long_graus", "long_min", "long_sec"), sep = " ", remove = FALSE) %>% 
+  dplyr::mutate(dplyr::across(.cols = tidyselect::starts_with(c("lat_", "long_")), as.double),
+    latitude_decimal = biogeo::dms2dd(dd = lat_graus, mm = lat_min, ss = lat_sec, ns = "S"),
+                longitude_decimal = biogeo::dms2dd(dd = long_graus, mm = long_min, ss = long_sec, ns = "W")) %>% 
+  leaflet::leaflet() %>% 
+  addTiles() %>% 
+  addMarkers(~longitude_decimal,  ~latitude_decimal)
+data(quakes)
 ```
 
 
 ## Análise descritiva dos dados
 
 > Em breve!
+
+Ao final, para exemplificar o uso dos dados obtidos, __uma breve análise descritiva será realizada com os dados de qualidade da água no território da Macrometrópole Paulista__.
 
 ## Conclusões
 
@@ -317,7 +430,7 @@ DT::datatable(head(dados_billings))
 
 - Documentar as funções!
 
-- Pensar em uma forma de disponibilizar para a comunidade. 
+- Pensar em uma forma de disponibilizar para a comunidade. Não sei se ficará nesse pacote, se ficar é necessário preencher o arquivo DESCRIPTION.
 
 - Desenvolvi funções para obter dados sobre o monitoramento das águas superficiais, porém no sistema existem também uma seção sobre águas subterrâneas. Seria interessante raspar também?
 

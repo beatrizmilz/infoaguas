@@ -4,7 +4,6 @@
 #'
 #' @examples get_sampling_points()
 get_sampling_points <- function() {
-  `%>%` <- magrittr::`%>%`
 
 
   u_busca <-

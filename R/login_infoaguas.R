@@ -8,7 +8,6 @@
 #'
 #' @examples
 login_infoaguas <- function(login, password) {
-  `%>%` <- magrittr::`%>%`
 
   u <- "https://sistemainfoaguas.cetesb.sp.gov.br"
 

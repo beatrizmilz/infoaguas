@@ -8,8 +8,6 @@ maybe_get_results_progresso <- function(points, path, prog) {
   maybe_get_results(points, path)
 }
 
-
-
 #' Title
 #'
 #' @param points
