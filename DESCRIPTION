@@ -38,6 +38,8 @@ Imports:
     abjutils,
     xml2,
     readr,
-    lubridate
+    lubridate,
+    biogeo,
+    tidyselect
 Depends: 
     R (>= 2.10)

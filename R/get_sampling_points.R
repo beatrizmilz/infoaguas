@@ -67,7 +67,8 @@ get_sampling_points <- function() {
 
     join_code_muni <-  tabela_pontos %>%
       dplyr::left_join(infoaguas::municipios_sp, by = "muni") %>%
-      dplyr::select(-muni)
+      dplyr::select(-muni) %>%
+      dplyr::mutate(code_muni = as.character(code_muni))
 
 
     join_code_muni

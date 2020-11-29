@@ -41,7 +41,13 @@ tidy_infoaguas <- function(path) {
         ),
         altitude = as.double(altitude)
       ) %>%
-      dplyr::relocate(c(valor_numerico, valor_texto), .after = valor)
+      dplyr::relocate(c(valor_numerico, valor_texto), .after = valor) %>%
+      tidyr::separate(latitude, into = c("lat_graus", "lat_min", "lat_sec"), sep = " ", remove = FALSE) %>%
+      tidyr::separate(longitude, into = c("long_graus", "long_min", "long_sec"), sep = " ", remove = FALSE) %>%
+      dplyr::mutate(dplyr::across(.cols = tidyselect::starts_with(c("lat_", "long_")), as.double),
+                    latitude_decimal = biogeo::dms2dd(dd = lat_graus, mm = lat_min, ss = lat_sec, ns = "S"),
+                    longitude_decimal = biogeo::dms2dd(dd = long_graus, mm = long_min, ss = long_sec, ns = "W")) %>%
+      dplyr::select(-tidyselect::starts_with(c("lat_", "long_")))
 
   })
 

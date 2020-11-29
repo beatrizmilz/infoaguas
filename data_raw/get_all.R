@@ -32,4 +32,6 @@ while(length(todos_codigos) > length(arquivos_baixados) + 1){
 
 dados_infoaguas <- tidy_infoaguas("inst/download/")
 
-usethis::use_data(dados_infoaguas, overwrite = TRUE)
+write.csv2(dados_infoaguas, "inst/tutorials/trabalho_final/dados_infoaguas.csv")
+
+#usethis::use_data(dados_infoaguas, overwrite = TRUE)
