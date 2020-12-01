@@ -12,6 +12,3 @@ get_sampling_points()
 \description{
 Função para obter a tabela de pontos de monitoramneto
 }
-\examples{
-get_sampling_points()
-}

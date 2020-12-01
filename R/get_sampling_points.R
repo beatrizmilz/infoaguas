@@ -2,7 +2,7 @@
 #' @return
 #' @export
 #'
-#' @examples get_sampling_points()
+#' @examples
 get_sampling_points <- function() {
 
 
