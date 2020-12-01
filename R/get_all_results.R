@@ -1,10 +1,21 @@
-maybe_get_results <-
-  purrr::possibly(get_results, otherwise = "Erro")
-
-
+#' Title
+#'
+#' @param points
+#' @param path
+#' @param prog
+#'
+#' @return
+#' @export
+#'
+#' @examples
 maybe_get_results_progresso <- function(points, path, prog) {
   if (!missing(prog))
     prog()
+
+  maybe_get_results <-
+    purrr::possibly(get_results, otherwise = "Erro")
+
+
   maybe_get_results(points, path)
 }
 
