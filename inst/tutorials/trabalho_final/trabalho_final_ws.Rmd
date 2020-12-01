@@ -22,6 +22,11 @@ sampling_points <- readr::read_csv2("sampling_points.csv")
 
 dados_billings <- readr::read_rds("dados_billings.rds")
 
+pontos_billings <- c("PINH04100", "BILL02030", "BILL02100","BILL02500",
+  "BITQ00100", "BILL02500",  "BILL02900", "RGDE02900", "BIRP00500",
+  "RGDE02200", "RGDE02030"
+)
+
 ```
 
 **Trabalho final para o curso '[Web Scraping](https://www.curso-r.com/cursos/web-scraping/)'**. <br>
@@ -41,7 +46,7 @@ Boas vindas! Esta página corresponde ao trabalho final para o curso [Web Scrapi
 
 O monitoramento ambiental é, segundo a [Empresa Brasileira de Pesquisa Agropecuária (EMBRAPA)](http://www.agencia.cnptia.embrapa.br/gestor/cana-de-acucar/arvore/CONTAG01_73_711200516719.html),   "um processo de coleta de dados, estudo e acompanhamento contínuo e sistemático das variáveis ambientais, com o objetivo de identificar e avaliar - qualitativa e quantitativamente - as condições dos recursos naturais em um determinado momento, assim como as tendências ao longo do tempo".
 
-A coleta de dados ambientais é representada na figura a seguir como a primeira etapa em um workflow de Ciência de Dados Ambientais (tradução do chamado de _Environmental Data Science_ por Horst). A etapa de coleta de dados é muito importante, abrangendo diferentes tecnologias: por sensoriamento remoto, através de estações meteorológicas automáticas, coletas _in situ_, entre outros.
+A coleta de dados é representada na figura a seguir como a primeira etapa em um workflow de Ciência de Dados. A etapa de coleta de dados ambientais abrange diferentes tecnologias: por sensoriamento remoto, através de estações meteorológicas automáticas, coletas _in situ_, entre outros.
 
 ```{r echo=FALSE, fig.cap="Figura: Versão expandida do ciclo da Ciência de dados, por @wickhamR4DS2017. Fonte: Ilustração por <a href='https://github.com/allisonhorst/stats-illustrations'>Allison Horst</a>."}
 knitr::include_graphics("https://raw.githubusercontent.com/allisonhorst/stats-illustrations/master/openscapes/environmental-data-science-r4ds-general.png")
@@ -53,7 +58,7 @@ A coleta de amostras de águas superficiais é realizado _in situ_, ou seja, no 
 A Companhia Ambiental do Estado de São Paulo (CETESB) é a agência ambiental responsável pelo desenvolvimento de ações de controle, licenciamento, fiscalização e monitoramento das atividades potencialmente poluidoras no Estado de São Paulo[*](https://www.saopaulo.sp.gov.br/orgaos-e-entidades/empresas/cetesb/). Essa agência realiza o monitoramento da qualidade das águas das praias, rios, represas, do ar e do solo no Estado de São Paulo.
 
 
-Os dados referentes ao monitoramento da qualidade do ar são disponibilizados no sistema [Qualar](https://cetesb.sp.gov.br/ar/qualar/), e o sistema [Infoaguas](https://cetesb.sp.gov.br/infoaguas/) disponibiliza dados referentes à qualidade da água. Entretanto, não existe uma API (_Application Programming Interface_) pública para acesso dessas informações, e ambos os sistemas foram elaborados de forma que obter informações para um amplo recorte espacial e temporal seja trabalhoso, requerendo bastante trabalho manual. 
+Os dados referentes ao monitoramento da qualidade do ar são disponibilizados no sistema [Qualar](https://cetesb.sp.gov.br/ar/qualar/), e o sistema [Infoaguas](https://cetesb.sp.gov.br/infoaguas/) disponibiliza dados referentes à qualidade da água. Entretanto, não existe uma API (_Application Programming Interface_) pública para acesso dessas informações, e ambos os sistemas foram elaborados de forma que obter informações para um amplo recorte espacial e temporal pode ser trabalhoso, requerendo bastante trabalho manual. 
 
 ```{r include=FALSE}
 pontos_ativos <- sampling_points %>% 
@@ -122,7 +127,7 @@ Além destes, para a elaboração deste relatório também foi utilizado os paco
 
 ## Acessando os dados
 
-Para demonstrar como funciona o acesso manual no sistema Infoaguas, a seguir estão algumas _screenshots_ que demonstram o fluxo de navegação no site até que seja possível obter os dados.
+Para demonstrar como funciona o __acesso manual__ no sistema Infoaguas, a seguir estão algumas _screenshots_ que demonstram o fluxo de navegação no site até que seja possível obter os dados.
 
 1. Ao acessar o Sistema INFOAGUAS (através do link https://sistemainfoaguas.cetesb.sp.gov.br/ ), é solicitado a autenticação através de login e senha. Caso não tenha um cadastro, é possível realizar através do botão "Novo Usuário".
 
@@ -143,9 +148,13 @@ knitr::include_graphics("images/infoaguas_3.PNG")
 
 
 Neste mesmo formlário,  é possível filtrar por:
+
   - Todos (sem filtro)
+  
   - UGRHI (Unidade de Gerenciamento de Recursos Hídricos. Por exemplo: Alto Tietê)
+  
   - Sistema Hídrico (por exemplo: Represa Billings)
+  
   - Município
   
 Neste exemplo realizaremos a pesquisa por ponto de monitoramento, e por UGRHI, escolhendo Alto Tietê.
@@ -169,7 +178,7 @@ knitr::include_graphics("images/infoaguas_8.png")
 
 ```{r include=FALSE}
 n_pesquisas <-
-  sampling_points %>% dplyr::filter(sist_hidrico == "Reservatório Billings") %>%
+  sampling_points %>% dplyr::filter(cod_ponto %in% pontos_billings) %>%
   dplyr::mutate(
     data_final = dplyr::case_when(is.na(data_fim) ~ Sys.Date(),
                                   TRUE ~ data_fim),
@@ -177,6 +186,7 @@ n_pesquisas <-
     anos_operacao = as.double(tempo_operacao / 365),
     pesquisas = ceiling(anos_operacao / 5)
   )
+
 
 total_pesquisas_billings <-
   n_pesquisas %>% 
@@ -233,7 +243,7 @@ A seguir, apresento uma breve descrição das funções desenvolvidas neste trab
 
 ### Autenticação no sistema
 
-O sistema InfoÁguas solicita login para acessar os dados. Portanto, primeiramente é necessário realizar a autentição.
+O sistema Infoaguas solicita login para acessar os dados. Portanto, primeiramente é necessário realizar a autentição.
 
 A função [`login_infoaguas()`](https://github.com/beatrizmilz/infoaguas/blob/master/R/login_infoaguas.R) tem como argumentos o email (`login`) e a senha (`password`), e realiza a autenticação no sistema Infoaguas através de uma requisição do tipo `POST`.
 
@@ -268,6 +278,8 @@ get_results(sampling_point = ... , path = "..../")
 ```{r eval=FALSE, include=TRUE}
 get_all_results(points = ... , path = "..../")
 ```
+
+> Ao obter os dados, não é necessário limitar o período de busca para 5 anos. A função foi desenvolvida para fazer a busca por todos os dados ao longo do tempo (desde o início do funcionamento do ponto, até atualmente).
 
 ### Arrumar as bases
 
@@ -361,61 +373,53 @@ análise do parâmetro.
 
 
 ```{r eval=FALSE, include=TRUE}
-dplyr::glimpse(dados_infoaguas)
+# > dplyr::glimpse(dados_infoaguas)
 # Rows: 1,921,122
-# Columns: 28
-# $ periodo_de              <date> 1977-11-01, 1977-11-01, 1977-11-01, 1977-11-01, 1977-11-01, ...
-# $ periodo_ate             <date> 2020-11-28, 2020-11-28, 2020-11-28, 2020-11-28, 2020-11-28, ...
-# $ cod_interaguas          <chr> "100", "100", "100", "100", "100", "100", "100", "100", "100"...
-# $ tipo_rede               <chr> "Rede Básica", "Rede Básica", "Rede Básica", "Rede Básica", "...
-# $ ugrhi                   <chr> "06 - ALTO TIÊTE", "06 - ALTO TIÊTE", "06 - ALTO TIÊTE", "06 ...
-# $ codigo_ponto            <chr> "COGR00900", "COGR00900", "COGR00900", "COGR00900", "COGR0090...
-# $ status_ponto            <chr> "Ativo", "Ativo", "Ativo", "Ativo", "Ativo", "Ativo", "Ativo"...
-# $ data_coleta             <date> 1978-01-01, 1978-04-01, 1978-05-01, 1978-07-01, 1978-09-01, ...
-# $ hora_coleta             <Period> 12H 0M 0S, 12H 0M 0S, 12H 0M 0S, 12H 0M 0S, 12H 0M 0S, 12H...
-# $ parametro               <chr> "pH", "pH", "pH", "pH", "pH", "pH", "pH", "pH", "pH", "pH", "...
-# $ sinal                   <chr> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N...
-# $ valor                   <chr> "6,40000000", "7,20000000", "6,80000000", "6,50000000", "6,50...
-# $ valor_numerico          <dbl> 6.4, 7.2, 6.8, 6.5, 6.5, 6.7, 6.6, 6.9, 6.4, 6.4, 6.8, 5.0, 6...
-# $ valor_texto             <chr> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N...
-# $ unidade                 <chr> "U.pH", "U.pH", "U.pH", "U.pH", "U.pH", "U.pH", "U.pH", "U.pH...
-# $ tipo_parametro          <chr> "3- Químicos", "3- Químicos", "3- Químicos", "3- Químicos", "...
-# $ sistema_hidrico         <chr> "Reservatório das Graças - COGR", "Reservatório das Graças - ...
-# $ tipo_de_sistema_hidrico <chr> "Reservatório (Lêntico)", "Reservatório (Lêntico)", "Reservat...
-# $ classe                  <chr> "Classe Especial", "Classe Especial", "Classe Especial", "Cla...
-# $ municipio               <chr> "COTIA", "COTIA", "COTIA", "COTIA", "COTIA", "COTIA", "COTIA"...
-# $ uf                      <chr> "SP", "SP", "SP", "SP", "SP", "SP", "SP", "SP", "SP", "SP", "...
-# $ inicio_operacao         <date> 1977-11-01, 1977-11-01, 1977-11-01, 1977-11-01, 1977-11-01, ...
-# $ fim_operacao            <date> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, ...
-# $ latitude                <chr> "23 39 12", "23 39 12", "23 39 12", "23 39 12", "23 39 12", "...
-# $ longitude               <chr> "46 58 03", "46 58 03", "46 58 03", "46 58 03", "46 58 03", "...
-# $ altitude                <dbl> 865, 865, 865, 865, 865, 865, 865, 865, 865, 865, 865, 865, 8...
-# $ localizacao             <chr> "Na barragem, junto à captação do Alto Cotia", "Na barragem, ...
-# $ captacao                <chr> "S", "S", "S", "S", "S", "S", "S", "S", "S", "S", "S", "S", "...
+# Columns: 30
+# $ periodo_de              <date> 1977-11-01, 1977-11-01, 1977-11-01, 1977-11-01, 1977-11-01,...
+# $ periodo_ate             <date> 2020-11-28, 2020-11-28, 2020-11-28, 2020-11-28, 2020-11-28,...
+# $ cod_interaguas          <chr> "100", "100", "100", "100", "100", "100", "100", "100", "100...
+# $ tipo_rede               <chr> "Rede Básica", "Rede Básica", "Rede Básica", "Rede Básica", ...
+# $ ugrhi                   <chr> "06 - ALTO TIÊTE", "06 - ALTO TIÊTE", "06 - ALTO TIÊTE", "06...
+# $ codigo_ponto            <chr> "COGR00900", "COGR00900", "COGR00900", "COGR00900", "COGR009...
+# $ status_ponto            <chr> "Ativo", "Ativo", "Ativo", "Ativo", "Ativo", "Ativo", "Ativo...
+# $ data_coleta             <date> 1978-01-01, 1978-04-01, 1978-05-01, 1978-07-01, 1978-09-01,...
+# $ hora_coleta             <Period> 12H 0M 0S, 12H 0M 0S, 12H 0M 0S, 12H 0M 0S, 12H 0M 0S, 12...
+# $ parametro               <chr> "pH", "pH", "pH", "pH", "pH", "pH", "pH", "pH", "pH", "pH", ...
+# $ sinal                   <chr> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, ...
+# $ valor                   <chr> "6,40000000", "7,20000000", "6,80000000", "6,50000000", "6,5...
+# $ valor_numerico          <dbl> 6.4, 7.2, 6.8, 6.5, 6.5, 6.7, 6.6, 6.9, 6.4, 6.4, 6.8, 5.0, ...
+# $ valor_texto             <chr> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, ...
+# $ unidade                 <chr> "U.pH", "U.pH", "U.pH", "U.pH", "U.pH", "U.pH", "U.pH", "U.p...
+# $ tipo_parametro          <chr> "3- Químicos", "3- Químicos", "3- Químicos", "3- Químicos", ...
+# $ sistema_hidrico         <chr> "Reservatório das Graças - COGR", "Reservatório das Graças -...
+# $ tipo_de_sistema_hidrico <chr> "Reservatório (Lêntico)", "Reservatório (Lêntico)", "Reserva...
+# $ classe                  <chr> "Classe Especial", "Classe Especial", "Classe Especial", "Cl...
+# $ municipio               <chr> "COTIA", "COTIA", "COTIA", "COTIA", "COTIA", "COTIA", "COTIA...
+# $ uf                      <chr> "SP", "SP", "SP", "SP", "SP", "SP", "SP", "SP", "SP", "SP", ...
+# $ inicio_operacao         <date> 1977-11-01, 1977-11-01, 1977-11-01, 1977-11-01, 1977-11-01,...
+# $ fim_operacao            <date> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,...
+# $ latitude                <chr> "23 39 12", "23 39 12", "23 39 12", "23 39 12", "23 39 12", ...
+# $ longitude               <chr> "46 58 03", "46 58 03", "46 58 03", "46 58 03", "46 58 03", ...
+# $ altitude                <dbl> 865, 865, 865, 865, 865, 865, 865, 865, 865, 865, 865, 865, ...
+# $ localizacao             <chr> "Na barragem, junto à captação do Alto Cotia", "Na barragem,...
+# $ captacao                <chr> "S", "S", "S", "S", "S", "S", "S", "S", "S", "S", "S", "S", ...
+# $ latitude_decimal        <dbl> -23.65333, -23.65333, -23.65333, -23.65333, -23.65333, -23.6...
+# $ longitude_decimal       <dbl> -46.9675, -46.9675, -46.9675, -46.9675, -46.9675, -46.9675, ...
 ```
 
 
 
-Para não sobrecarregar o relatório, será apresentado uma tabela de exemplo conendo apenas os dados referentes à Represa Billings. Exemplo da busca:
+Para não sobrecarregar o relatório, será apresentado uma tabela de exemplo conendo apenas os dados referentes à Represa Billings. Exemplo da busca utilizando funções desenvolvidas neste trabalho:
 
 ```{r eval=FALSE, message=FALSE, warning=FALSE, include=TRUE}
 # Autenticar
 infoaguas::login_infoaguas(login = Sys.getenv("CETESB_LOGIN"), 
                  password =  Sys.getenv("CETESB_PWD"))
 
-pontos_billings <- c(
-  "PINH04100",
-  "BILL02030",
-  "BILL02100",
-  "BILL02500",
-  "BITQ00100",
-  "BILL02500",
-  "BILL02900",
-  "RGDE02900",
-  "BIRP00500",
-  "RGDE02200",
-  "RGDE02030"
-)
+pontos_billings <- c("PINH04100", "BILL02030", "BILL02100","BILL02500",
+  "BITQ00100", "BILL02500",  "BILL02900", "RGDE02900", "BIRP00500",
+  "RGDE02200", "RGDE02030")
 
 # Definir os pontos para obter os dados
 codigos <-
@@ -439,16 +443,26 @@ readr::write_rds(dados_billings, "dados_billings.rds")
 A base de exemplo, contendo apenas os dados referentes à Represa Billings, possui cerca de  `r ceiling(nrow(dados_billings)/1000)` mil observações e `r ncol(dados_billings)` variáveis.
 
 
-```{r message=FALSE, warning=FALSE}
+```{r echo=FALSE, message=FALSE, warning=FALSE}
 DT::datatable(head(dados_billings))
 ```
 
 
 ## Exemplo de uso dos dados
 
-para exemplificar o uso dos dados obtidos, __será realizada uma comparação dos dados de qualidade da água da Represa Billings com os padrões apresentados na [Resolução CONAMA 357 nº 2005](http://www2.mma.gov.br/port/conama/legiabre.cfm?codlegi=459)__.
+Para exemplificar o uso dos dados obtidos, será realizada uma comparação dos dados de qualidade da água da Represa Billings com os padrões apresentados na [Resolução CONAMA 357 nº 2005](http://www2.mma.gov.br/port/conama/legiabre.cfm?codlegi=459) para os parâmetros: pH, oxigênio dissolvido e clorofila-a.
 
-Abaixo segue um mapa onde estão apresentados os pontos de coleta na represa Billings:
+
+A [Resolução CONAMA 357 nº 2005](http://www2.mma.gov.br/port/conama/legiabre.cfm?codlegi=459) classifica os corpos hídricos em classes, e estabelece usos e padrões de qualidade adequados para cada classe.
+
+As classes são:
+
+```{r echo=FALSE}
+conama357 <- readxl::read_excel("conama357.xlsx")
+conama357 %>% knitr::kable(col.names = c("Classe", "Usos da água"))
+```
+
+Abaixo segue um mapa onde estão apresentados os pontos de coleta na represa Billings, sendo que o a cor do marcador do ponto representa a classe:
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 library(leaflet)
@@ -477,6 +491,8 @@ coordenadas <-
  addCircleMarkers(~longitude_decimal,  ~latitude_decimal, popup = ~texto, color = ~cores)
 
 ```
+
+No gráfico a seguir, está apresentada a conformidade (ou não) das amostras em relação aos padrões definidos na Resolução, segundo a classe do ponto, para os parâmetros Clorofila-a, pH e Oxigênio Dissolvido coletados desde 2015:
 
 ```{r echo=FALSE, fig.height=8}
 billings_conformidade <- dados_billings %>% 
@@ -516,10 +532,8 @@ billings_conformidade <- dados_billings %>%
       
          # Clorofila-a  -----------------------------------
       parametro == "Clorofila-a" &
-        classe == "Classe 4" & valor_numerico <= 60 ~ "Conforme",
-      parametro == "Clorofila-a" &
-        classe == "Classe 4" & valor_numerico > 60 ~ "Não conforme",
-      
+        classe == "Classe 4"  ~ "Padrão não especificado na legislação",
+     
       
       parametro == "Clorofila-a" &
         classe == "Classe 2" & valor_numerico <= 30 ~ "Conforme",
@@ -531,17 +545,22 @@ billings_conformidade <- dados_billings %>%
         classe == "Classe Especial" & valor_numerico <= 10 ~ "Conforme",
       parametro == "Clorofila-a" &
         classe == "Classe Especial" & valor_numerico > 10 ~ "Não conforme",
-    )
+    ),
+    nome = glue::glue("{classe} - {codigo_ponto}")
   ) %>% 
-  dplyr::filter(ano >= 2010)
+  dplyr::filter(ano >= 2015)
 
 library(ggplot2)
 billings_conformidade %>% 
-  dplyr::count(parametro, ano, data_coleta, conformidade_conama, codigo_ponto) %>% 
+  dplyr::count(parametro, ano, data_coleta, conformidade_conama, nome,  codigo_ponto, classe) %>% 
   ggplot() +
-  geom_col(aes(y = codigo_ponto, x = n, fill = conformidade_conama)) +
+  geom_col(aes(y = nome, x = n, fill = conformidade_conama)) +
   facet_wrap(~ parametro, scales = "free_x", nrow = 3) +
-  theme_bw()
+  theme_bw() +
+  viridis::scale_fill_viridis(discrete = TRUE, direction = -1) +
+  labs( y = "Classe e código do ponto de coleta de amostras",
+        x = "Número de análises", fill = "Conformidade com os valores definidos na \n Resolução CONAMA 357/2005") +
+    theme(legend.position="bottom")
 ```
 
 
