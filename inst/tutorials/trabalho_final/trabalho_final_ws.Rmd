@@ -70,7 +70,7 @@ O pacote [`Rpollution`](https://github.com/williamorim/Rpollution), desenvolvido
 > Segundo os dados disponibilizados no sistema Infoaguas, atualmente existem `r nrow(pontos_ativos)` pontos de coleta ativos no Estado de São Paulo.
 
 
-Portanto, __o objetivo deste trabalho foi desenvolver funções que possibilitem acessar os dados disponibilizados no sistema Infoaguas para Águas Superficiais__, para que pessoas pesquisadoras, jornalistas, e outras interessadas possam ter acesso à estes dados de forma automatizada. Ao final, para exemplificar o uso dos dados obtidos, __será realizada uma comparação dos dados de qualidade da água da Represa Billings com os padrões apresentados na [Resolução CONAMA 357 nº 2005](http://www2.mma.gov.br/port/conama/legiabre.cfm?codlegi=459)__.
+Portanto, __o objetivo deste trabalho foi desenvolver funções que possibilitem acessar os dados disponibilizados no sistema Infoaguas para Águas Superficiais__, para que pessoas pesquisadoras, jornalistas, e outras interessadas possam ter acesso à estes dados de forma automatizada. 
 
 ### Pacotes utilizados
 
@@ -440,7 +440,7 @@ dados_billings <- tidy_infoaguas(path_billings)
 readr::write_rds(dados_billings, "dados_billings.rds")
 ```
 
-A base de exemplo, contendo apenas os dados referentes à Represa Billings, possui cerca de  `r ceiling(nrow(dados_billings)/1000)` mil observações e `r ncol(dados_billings)` variáveis.
+A base de exemplo, contendo apenas os dados referentes à Represa Billings, possui cerca de  `r ceiling(nrow(dados_billings)/1000)` mil observações e `r ncol(dados_billings)` variáveis. A base a seguir é uma amostra da tabela obtida:
 
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}

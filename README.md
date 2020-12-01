@@ -1,0 +1,18 @@
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+# Infoaguas
+
+<!-- badges: start -->
+
+<!-- badges: end -->
+
+Este repositório corresponde ao trabalho final para o curso [Web
+Scraping](https://www.curso-r.com/cursos/web-scraping/), oferecido pela
+[Curso-R](https://www.curso-r.com/) e ministrado por [Julio
+Trecenti](https://github.com/jtrecenti) e [Caio
+Lente](https://lente.dev/). O objetivo proposto para o trabalho final é
+construir um produto de dados que utilize Web Scraping.
+
+O resultado pode ser acessado através [deste
+link](https://beatriz-milz.shinyapps.io/trabalho_final_ws/).

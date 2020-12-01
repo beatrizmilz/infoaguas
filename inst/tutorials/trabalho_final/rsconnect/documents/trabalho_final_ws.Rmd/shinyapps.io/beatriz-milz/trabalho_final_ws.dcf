@@ -5,9 +5,9 @@ account: beatriz-milz
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 3320506
-bundleId: 3920282
+bundleId: 3929421
 url: https://beatriz-milz.shinyapps.io/trabalho_final_ws/
-when: 1606687083.3748
+when: 1606854940.13574
 asMultiple: FALSE
 asStatic: FALSE
 ignoredFiles: billings
