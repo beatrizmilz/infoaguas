@@ -2,6 +2,7 @@
 title: "Qualidade da água em São Paulo"
 output: 
   learnr::tutorial:
+    language: pt
     css: css/custom.css
     progressive: false
     allow_skip: true
