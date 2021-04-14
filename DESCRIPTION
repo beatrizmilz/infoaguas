@@ -8,7 +8,7 @@ Authors@R:
            email = "milz.bea@gmail.com",
            comment = c(ORCID = "0000-0002-3064-4486"))
 Description: Obtém dados da CETESB de monitoramento de qualidade da água no Estado de São Paulo
-License: CC0
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
