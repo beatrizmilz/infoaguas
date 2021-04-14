@@ -54,8 +54,8 @@ get_results <- function(sampling_point, path) {
   if (file.exists(arquivo)) {
     message(
       glue::glue(
-        "Arquivo não baixado, referente ao ponto {sampling_point} nos períodos {start_2} a {end_2},
-        pois o arquivo correspondente já existe no diretório."
+        "Arquivo n\\u00e3o baixado, referente ao ponto {sampling_point} nos per\\u00edodos {start_2} a {end_2},
+        pois o arquivo correspondente j\\u00e1 existe no diret\\u00f3rio."
       )
     )
 
@@ -70,7 +70,7 @@ get_results <- function(sampling_point, path) {
   } else {
     message(
       glue::glue(
-        "Arquivo não baixado, referente ao ponto {sampling_point} nos períodos {start_2} a {end_2}."
+        "Arquivo n\\u00e3o baixado, referente ao ponto {sampling_point} nos per\\u00edodos {start_2} a {end_2}."
       )
     )
   }

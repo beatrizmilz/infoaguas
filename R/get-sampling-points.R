@@ -1,4 +1,4 @@
-#' Função para obter a tabela de pontos de monitoramneto
+#' Fun\u00e7\u00e3o para obter a tabela de pontos de monitoramneto
 #' @return
 #' @export
 #'
@@ -75,11 +75,11 @@ get_sampling_points <- function() {
 
   } else {
     stop(
-      "Você precisa realizar a autenticação antes de utilizar essa função.
-         Utilize a seguinte função, informando seu email e senha cadastrados no sistema Infoaguas:
+      "Voc\u00ea precisa realizar a autentica\u00e7\u00e3o antes de utilizar essa fun\u00e7\u00e3o.
+         Utilize a seguinte fun\u00e7\u00e3o, informando seu email e senha cadastrados no sistema Infoaguas:
          login_infoaguas(login = .... , password = ....)
 
-         Caso não tenha realizado o cadastro, é possível realizar neste site:
+         Caso n\u00e3o tenha realizado o cadastro, \u00e9 poss\u00edvel realizar neste site:
          https://sistemainfoaguas.cetesb.sp.gov.br/Login/Index"
     )
   }

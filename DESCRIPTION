@@ -7,7 +7,7 @@ Authors@R:
            role = c("aut", "cre"),
            email = "milz.bea@gmail.com",
            comment = c(ORCID = "0000-0002-3064-4486"))
-Description: Obtém dados da CETESB de monitoramento de qualidade da água no Estado de São Paulo
+Description: Obtém dados da CETESB de monitoramento de qualidade da água no Estado de São Paulo.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -22,26 +22,21 @@ VignetteBuilder: knitr
 Imports: 
     magrittr,
     purrr,
-    usethis,
-    httr,
-    rvest,
-    janitor,
-    tibble,
-    dplyr,
-    future,
-    furrr,
     progressr,
+    httr,
     stringr,
     glue,
-    geobr,
-    sf,
+    xml2, 
+    janitor,
+    dplyr,    
+    tibble,    
     abjutils,
-    xml2,
+    lubridate,  
     readr,
-    lubridate,
-    biogeo,
+    tidyr,
     tidyselect,
-    readxl,
-    tidyr
+    biogeo,
+    rvest,
+    readxl
 Depends: 
     R (>= 2.10)

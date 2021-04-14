@@ -1,0 +1,31 @@
+utils::globalVariables(
+  c(
+    "altitude",
+    "cod_interaguas",
+    "code_muni",
+    "data_coleta",
+    "data_fim data_inicio",
+    "fim_operacao",
+    "hora_coleta",
+    "inicio_operacao",
+    "lat_graus",
+    "lat_min",
+    "lat_sec",
+    "latitude",
+    "long_graus",
+    "long_min",
+    "long_sec",
+    "longitude",
+    "muni",
+    "municipio",
+    "periodo_ate",
+    "periodo_de",
+    "valor",
+    "valor_numerico",
+    "valor_texto",
+    "x",
+    ".",
+    "data_fim",
+    "data_inicio"
+  )
+)

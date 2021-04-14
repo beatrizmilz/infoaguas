@@ -32,9 +32,9 @@ tidy_infoaguas <- function(path) {
         valor_texto = dplyr::case_when(
           parametro %in% c(
             "Ens. Ecotoxic. C/ Ceriodaphnia dubia",
-            "Coloração",
-            "Chuvas nas últimas 24h",
-            "Indução de Micronúcleos"
+            "Colora\u00e7\u00e3o",
+            "Chuvas nas \u00faltimas 24h",
+            "Indu\u00e7\u00e3o de Micron\u00facleos"
           ) ~ as.character(valor),
 
           TRUE ~ NA_character_
